@@ -32,7 +32,6 @@
         h1 { font-size: 1.8rem; margin-bottom: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-main); }
         .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; }
 
-        /* Auth Styles */
         .auth-panel { margin-bottom: 2rem; }
         .auth-input { width: 100%; padding: 0.8rem; margin-bottom: 10px; background-color: #0d1117; border: 1px solid #30363d; color: var(--text-main); border-radius: 6px; }
         .auth-input:focus { outline: none; border-color: var(--neon-green); box-shadow: 0 0 5px rgba(57, 255, 20, 0.3); }
@@ -41,7 +40,6 @@
         .egg-btn { margin: 5px; padding: 0.8rem; background-color: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); border-radius: 6px; cursor: pointer; }
         .egg-btn:hover { background-color: rgba(57, 255, 20, 0.1); }
 
-        /* Game Styles */
         .hp-wrapper { margin-bottom: 2rem; text-align: left; }
         .hp-labels { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem; }
         .hp-bar-container { width: 100%; height: 24px; background-color: #21262d; border: 2px solid #30363d; border-radius: 12px; overflow: hidden; position: relative; }
@@ -135,18 +133,20 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-firestore.js";
+        // 1. Fixed and Verified Version 10.12.0
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+        // 2. Your Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyABcxcl0uRz_ypDjjcb_lsft0AW0TO--Ls",
+            apiKey: "AIzaSyABCxcL0uRz_ypOjjCb_lsft0AWOTO--Ls",
             authDomain: "pomo-mon.firebaseapp.com",
             projectId: "pomo-mon",
             storageBucket: "pomo-mon.firebasestorage.app",
             messagingSenderId: "273551072268",
             appId: "1:273551072268:web:7d5650f2b3b877c4702229",
-            measurementId: "G-909Q6HPYYE"
+            measurementId: "G-9G9Q6HFYYE"
         };
 
         const app = initializeApp(firebaseConfig);
