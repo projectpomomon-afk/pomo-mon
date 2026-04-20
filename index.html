@@ -177,25 +177,46 @@
     </div>
 
     <script type="module">
-        // --- 1. Firebase Setup & Imports ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyABcxcl0uRz_ypOjjCb_lsft0AWOTO--Ls",
-            authDomain: "pomo-mon.firebaseapp.com",
-            projectId: "pomo-mon",
-            storageBucket: "pomo-mon.firebasestorage.app",
-            messagingSenderId: "273551072268",
-            appId: "1:273551072268:web:7d5650f2b3b877c4702229",
-            measurementId: "G-9G9Q6HFYYE"
-        };
+  // 1. Firebase Setup & Imports
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+  import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-firestore.js";
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
+  const firebaseConfig = {
+    apiKey: "AIzaSy...", // Keep your existing keys here
+    authDomain: "pomo-mon.firebaseapp.com",
+    projectId: "pomo-mon",
+    storageBucket: "pomo-mon.firebasestorage.app",
+    messagingSenderId: "273551072268",
+    appId: "1:273551072268:web:7d5650f2b3b877c4702229",
+    measurementId: "G-909Q6HPYYE"
+  };
+
+  // Initialize Firebase FIRST
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  // 2. Auth Logic
+  const login = () => {
+    signInWithRedirect(auth, provider);
+  };
+
+  // Catch the result after redirecting back to the site
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result) {
+        const user = result.user;
+        console.log("Logged in as:", user.displayName);
+        // Set your global user variable here
+        currentUserId = user.uid; 
+      }
+    }).catch((error) => {
+      console.error("Auth error:", error);
+    });
+
+  // ... 3. Rest of your state & variables ...
 
         // --- 2. State & Variables ---
         // Player & Auth State
