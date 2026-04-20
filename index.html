@@ -14,64 +14,34 @@
             --text-muted: #8b949e;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg-color); color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 100vh; overflow: hidden;
         }
 
         .container {
-            background-color: var(--panel-bg);
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            background-color: var(--panel-bg); border: 1px solid #30363d;
+            border-radius: 12px; padding: 2.5rem; width: 100%;
+            max-width: 450px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-main);
-        }
+        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-main); }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; }
 
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        /* --- Auth Styles --- */
+        /* Auth Styles */
         .auth-panel { margin-bottom: 2rem; }
-        .auth-input {
-            width: 100%; padding: 0.8rem; margin-bottom: 10px;
-            background-color: #0d1117; border: 1px solid #30363d;
-            color: var(--text-main); border-radius: 6px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        .auth-input { width: 100%; padding: 0.8rem; margin-bottom: 10px; background-color: #0d1117; border: 1px solid #30363d; color: var(--text-main); border-radius: 6px; }
         .auth-input:focus { outline: none; border-color: var(--neon-green); box-shadow: 0 0 5px rgba(57, 255, 20, 0.3); }
         .auth-buttons { display: flex; gap: 10px; margin-top: 10px; }
         
         .egg-btn { margin: 5px; padding: 0.8rem; background-color: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); border-radius: 6px; cursor: pointer; }
         .egg-btn:hover { background-color: rgba(57, 255, 20, 0.1); }
 
-        /* --- Game Styles --- */
+        /* Game Styles */
         .hp-wrapper { margin-bottom: 2rem; text-align: left; }
         .hp-labels { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem; }
         .hp-bar-container { width: 100%; height: 24px; background-color: #21262d; border: 2px solid #30363d; border-radius: 12px; overflow: hidden; position: relative; }
@@ -86,11 +56,7 @@
         }
         #active-pomo-display { margin-top: 10px; font-size: 0.7rem; color: var(--text-muted); text-shadow: none; }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.2); }
-            70% { box-shadow: 0 0 0 15px rgba(57, 255, 20, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); }
-        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.2); } 70% { box-shadow: 0 0 0 15px rgba(57, 255, 20, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); } }
 
         .settings-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; }
         .settings-row input { background-color: #0d1117; border: 1px solid #30363d; color: var(--neon-green); padding: 0.3rem; border-radius: 4px; width: 60px; text-align: center; font-weight: bold; font-family: monospace; }
@@ -109,12 +75,7 @@
         #signup-btn { color: var(--neon-green); border-color: var(--neon-green); }
         #give-up-btn:hover { background-color: rgba(255, 51, 51, 0.1); transform: translateY(-2px); }
 
-        /* --- Modal penalty --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center;
-            justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background-color: #000; border: 2px solid var(--neon-red); padding: 3rem 2rem; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(255, 51, 51, 0.5); transform: scale(0.9); }
         .modal-overlay.active .modal-content { transform: scale(1); }
@@ -125,20 +86,14 @@
 </head>
 <body>
 
-        <div id="mobile-debug" style="background: #ff3333; color: white; padding: 10px; font-size: 12px; z-index: 9999; position: absolute; top: 0; left: 0; width: 100%; word-wrap: break-word;">
+    <div id="mobile-debug" style="background: #ff3333; color: white; padding: 10px; font-size: 12px; z-index: 9999; position: absolute; top: 0; left: 0; width: 100%; word-wrap: break-word;">
         System Status: Ready. Waiting for errors...
     </div>
     <script>
-        // Catch standard errors
-        window.onerror = function(message, source, lineno, colno, error) {
-            document.getElementById('mobile-debug').innerHTML += `<br>❌ Error: ${message}`;
-            return false;
-        };
-        // Catch Firebase Promise errors (like database failures)
-        window.addEventListener('unhandledrejection', function(event) {
-            document.getElementById('mobile-debug').innerHTML += `<br>⚠️ Firebase Error: ${event.reason}`;
-        });
+        window.onerror = function(message) { document.getElementById('mobile-debug').innerHTML += `<br>❌ Error: ${message}`; return false; };
+        window.addEventListener('unhandledrejection', function(event) { document.getElementById('mobile-debug').innerHTML += `<br>⚠️ Firebase Error: ${event.reason}`; });
     </script>
+
     <div class="container">
         <h1>TabTamer</h1>
         <div class="subtitle">Stay focused. Protect your Pomo-mon.</div>
@@ -161,41 +116,20 @@
 
         <div id="game-section" style="display: none;">
             <div class="hp-wrapper">
-                <div class="hp-labels">
-                    <span>Pomo-mon HP</span>
-                    <span id="hp-text">100 / 100</span>
-                </div>
-                <div class="hp-bar-container">
-                    <div id="hp-fill"></div>
-                </div>
+                <div class="hp-labels"><span>Pomo-mon HP</span><span id="hp-text">100 / 100</span></div>
+                <div class="hp-bar-container"><div id="hp-fill"></div></div>
             </div>
-
-            <div class="sprite-placeholder">
-                [ 2D SPRITE HERE ]
-                <span id="active-pomo-display">Loading...</span>
-            </div>
-
-            <div class="settings-row">
-                <label for="time-input">Focus Duration (mins):</label>
-                <input type="number" id="time-input" value="25" min="1" max="120">
-            </div>
-
+            <div class="sprite-placeholder">[ 2D SPRITE HERE ]<span id="active-pomo-display">Loading...</span></div>
+            <div class="settings-row"><label for="time-input">Focus Duration (mins):</label><input type="number" id="time-input" value="25" min="1" max="120"></div>
             <div class="timer-display" id="timer">25:00</div>
-
-            <div class="controls">
-                <button id="start-btn">Start Focus</button>
-                <button id="give-up-btn">Give Up</button>
-            </div>
+            <div class="controls"><button id="start-btn">Start Focus</button><button id="give-up-btn">Give Up</button></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="penalty-modal">
         <div class="modal-content">
             <div class="modal-title">⚠️ TAB SWITCH DETECTED! ⚠️</div>
-            <div class="modal-body">
-                Focus broken. Pomo-mon took <strong>15 Damage</strong>! 
-                Resume immediately before it faints.
-            </div>
+            <div class="modal-body">Focus broken. Pomo-mon took <strong>15 Damage</strong>! Resume immediately before it faints.</div>
             <button id="resume-btn">Resume Focus</button>
         </div>
     </div>
@@ -205,7 +139,6 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-firestore.js";
 
-        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyABcxcl0uRz_ypDjjcb_lsft0AW0TO--Ls",
             authDomain: "pomo-mon.firebaseapp.com",
@@ -220,12 +153,10 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- State Variables ---
         let currentUserUid = null;
         let activeMonsterId = null;
         const MAX_HP = 100;
         const PENALTY_DAMAGE = 15;
-        
         let currentHP = MAX_HP;
         let timeLeft = 25 * 60;
         let isRunning = false;
@@ -233,28 +164,23 @@
         let timerInterval;
         let pingInterval;
 
-        // --- DOM Elements ---
         const loginSection = document.getElementById('login-section');
         const eggSelection = document.getElementById('egg-selection');
         const gameSection = document.getElementById('game-section');
-        
         const emailInput = document.getElementById('email-input');
         const passwordInput = document.getElementById('password-input');
         const loginBtn = document.getElementById('login-btn');
         const signupBtn = document.getElementById('signup-btn');
         const eggButtons = document.querySelectorAll('.egg-btn');
-        
         const timerDisplay = document.getElementById('timer');
         const startBtn = document.getElementById('start-btn');
         const giveUpBtn = document.getElementById('give-up-btn');
         const hpFill = document.getElementById('hp-fill');
         const hpText = document.getElementById('hp-text');
         const timeInput = document.getElementById('time-input');
-        
         const modalOverlay = document.getElementById('penalty-modal');
         const resumeBtn = document.getElementById('resume-btn');
 
-        // --- Authentication ---
         signupBtn.addEventListener('click', async () => {
             const email = emailInput.value;
             const password = passwordInput.value;
@@ -262,9 +188,7 @@
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
                 alert("Account created! Logging in...");
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
+            } catch (error) { alert("Error: " + error.message); }
         });
 
         loginBtn.addEventListener('click', async () => {
@@ -273,9 +197,7 @@
             if(!email || !password) return alert("Please enter both email and password.");
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                alert("Login failed: " + error.message);
-            }
+            } catch (error) { alert("Login failed: " + error.message); }
         });
 
         onAuthStateChanged(auth, async (user) => {
@@ -291,14 +213,11 @@
             }
         });
 
-        // --- Database & Ecosystem ---
         async function checkPlayerEcosystem(uid) {
             const playerRef = doc(db, "players", uid);
             const playerSnap = await getDoc(playerRef);
-
             if (playerSnap.exists() && playerSnap.data().active_pomomon_id) {
-                const data = playerSnap.data();
-                loadGameScreen(data.active_pomomon_id);
+                loadGameScreen(playerSnap.data().active_pomomon_id);
             } else {
                 eggSelection.style.display = 'block';
                 gameSection.style.display = 'none';
@@ -308,8 +227,7 @@
         eggButtons.forEach(button => {
             button.addEventListener('click', async (e) => {
                 eggButtons.forEach(btn => btn.disabled = true); 
-                const element = e.target.getAttribute('data-element');
-                await claimStarterEgg(currentUserUid, element);
+                await claimStarterEgg(currentUserUid, e.target.getAttribute('data-element'));
             });
         });
 
@@ -317,19 +235,8 @@
             try {
                 const playerRef = doc(db, "players", uid);
                 const rosterCollection = collection(playerRef, "roster");
-
-                const newMonsterRef = await addDoc(rosterCollection, {
-                    species: `Egg_${element}`,
-                    current_level: 0,
-                    current_xp: 0
-                });
-
-                await setDoc(playerRef, {
-                    current_streak: 0,
-                    last_session_date: serverTimestamp(),
-                    active_pomomon_id: newMonsterRef.id
-                });
-
+                const newMonsterRef = await addDoc(rosterCollection, { species: `Egg_${element}`, current_level: 0, current_xp: 0 });
+                await setDoc(playerRef, { current_streak: 0, last_session_date: serverTimestamp(), active_pomomon_id: newMonsterRef.id });
                 eggSelection.style.display = 'none';
                 loadGameScreen(newMonsterRef.id);
             } catch (error) {
@@ -342,45 +249,29 @@
             activeMonsterId = monsterId;
             gameSection.style.display = 'block';
             document.getElementById('active-pomo-display').innerText = `ID: ${activeMonsterId.slice(0, 8)}...`;
-            updateTimerDisplay();
-            updateHPDisplay();
+            updateTimerDisplay(); updateHPDisplay();
         }
 
-        // --- Timer & Game Logic ---
         timeInput.addEventListener('change', (e) => {
             if (!isRunning) {
                 let mins = parseInt(e.target.value);
-                if (isNaN(mins) || mins < 1) mins = 1;
-                if (mins > 120) mins = 120;
-                e.target.value = mins;
-                timeLeft = mins * 60;
-                updateTimerDisplay();
+                if (isNaN(mins) || mins < 1) mins = 1; if (mins > 120) mins = 120;
+                e.target.value = mins; timeLeft = mins * 60; updateTimerDisplay();
             }
         });
 
         function startTimer() {
             if (timeLeft <= 0 || currentHP <= 0) return;
-            
-            isRunning = true;
-            isCheating = false;
-            startBtn.innerText = "Focusing...";
-            startBtn.disabled = true;
-            timeInput.disabled = true;
-            
+            isRunning = true; isCheating = false;
+            startBtn.innerText = "Focusing..."; startBtn.disabled = true; timeInput.disabled = true;
             startPings();
-
             timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
+                timeLeft--; updateTimerDisplay();
                 if (timeLeft <= 0) completeSession();
             }, 1000);
         }
 
-        function stopTimerVariables() {
-            isRunning = false;
-            clearInterval(timerInterval);
-            clearInterval(pingInterval);
-        }
+        function stopTimerVariables() { isRunning = false; clearInterval(timerInterval); clearInterval(pingInterval); }
 
         async function completeSession() {
             stopTimerVariables();
@@ -389,505 +280,64 @@
                     const monsterRef = doc(db, "players", currentUserUid, "roster", activeMonsterId);
                     await setDoc(monsterRef, { current_xp: increment(50) }, { merge: true });
                     alert("Session Complete! +50 XP logged to your Pomo-mon.");
-                } catch (error) {
-                    alert("DB Error: " + error.message);
-                }
-            } else {
-                alert("Session Finished, but XP was forfeited due to tab switching.");
-            }
+                } catch (error) { alert("DB Error: " + error.message); }
+            } else { alert("Session Finished, but XP was forfeited due to tab switching."); }
             resetSession();
         }
 
         function giveUp() {
-            if (!confirm("Are you sure you want to give up? Your Pomo-mon will lose all its HP.")) return;
-            stopTimerVariables();
-            currentHP = 0;
-            updateHPDisplay();
-            setTimeout(() => {
-                alert("You gave up. Pomo-mon fainted.");
-                resetSession();
-            }, 500);
+            if (!confirm("Are you sure? Your Pomo-mon will lose all its HP.")) return;
+            stopTimerVariables(); currentHP = 0; updateHPDisplay();
+            setTimeout(() => { alert("You gave up. Pomo-mon fainted."); resetSession(); }, 500);
         }
 
         function resetSession() {
             stopTimerVariables();
-            const mins = parseInt(timeInput.value) || 25;
-            timeLeft = mins * 60;
-            currentHP = MAX_HP;
-            isCheating = false;
-            updateTimerDisplay();
-            updateHPDisplay();
-            
-            startBtn.innerText = "Start Focus";
-            startBtn.disabled = false;
-            timeInput.disabled = false;
+            timeLeft = (parseInt(timeInput.value) || 25) * 60;
+            currentHP = MAX_HP; isCheating = false;
+            updateTimerDisplay(); updateHPDisplay();
+            startBtn.innerText = "Start Focus"; startBtn.disabled = false; timeInput.disabled = false;
             resumeBtn.style.display = 'inline-block';
         }
 
-        // --- Tracking & Tab Detection ---
         function startPings() {
             logActivityToServer(); 
-            pingInterval = setInterval(() => {
-                if (!isCheating && isRunning) logActivityToServer();
-            }, 60000); 
+            pingInterval = setInterval(() => { if (!isCheating && isRunning) logActivityToServer(); }, 60000); 
         }
 
         async function logActivityToServer() {
-            try {
-                const playerRef = doc(db, "players", currentUserUid);
-                await setDoc(playerRef, { lastPing: serverTimestamp() }, { merge: true });
-            } catch (error) {
-                console.error("Ping failed.", error);
-            }
+            try { await setDoc(doc(db, "players", currentUserUid), { lastPing: serverTimestamp() }, { merge: true }); } 
+            catch (error) { console.error("Ping failed.", error); }
         }
 
         function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timerDisplay.innerText = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`;
         }
 
         function updateHPDisplay() {
             currentHP = Math.max(0, Math.min(currentHP, MAX_HP));
             const hpPercentage = (currentHP / MAX_HP) * 100;
-            hpFill.style.width = `${hpPercentage}%`;
-            hpText.innerText = `${currentHP} / ${MAX_HP}`;
-
-            if (hpPercentage <= 30) {
-                hpFill.style.backgroundColor = "var(--neon-red)";
-                hpFill.style.boxShadow = "0 0 10px var(--neon-red)";
-            } else if (hpPercentage <= 60) {
-                hpFill.style.backgroundColor = "#ffae42"; 
-                hpFill.style.boxShadow = "0 0 10px #ffae42";
-            } else {
-                hpFill.style.backgroundColor = "var(--neon-green)";
-                hpFill.style.boxShadow = "0 0 10px var(--neon-green)";
-            }
+            hpFill.style.width = `${hpPercentage}%`; hpText.innerText = `${currentHP} / ${MAX_HP}`;
+            if (hpPercentage <= 30) { hpFill.style.backgroundColor = "var(--neon-red)"; hpFill.style.boxShadow = "0 0 10px var(--neon-red)"; } 
+            else if (hpPercentage <= 60) { hpFill.style.backgroundColor = "#ffae42"; hpFill.style.boxShadow = "0 0 10px #ffae42"; } 
+            else { hpFill.style.backgroundColor = "var(--neon-green)"; hpFill.style.boxShadow = "0 0 10px var(--neon-green)"; }
         }
 
         function handleFocusLost() {
             if (!isRunning) return;
-            stopTimerVariables();
-            isCheating = true; 
-            currentHP -= PENALTY_DAMAGE;
-            updateHPDisplay();
-            modalOverlay.classList.add('active');
-
+            stopTimerVariables(); isCheating = true; currentHP -= PENALTY_DAMAGE;
+            updateHPDisplay(); modalOverlay.classList.add('active');
             if (currentHP <= 0) {
                 resumeBtn.style.display = 'none'; 
-                setTimeout(() => {
-                    modalOverlay.classList.remove('active');
-                    alert("Zero HP reached. Pomo-mon has fainted due to lack of focus!");
-                    resetSession();
-                }, 1500);
+                setTimeout(() => { modalOverlay.classList.remove('active'); alert("Zero HP. Pomo-mon fainted!"); resetSession(); }, 1500);
             }
         }
 
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === '        .controls { display: flex; gap: 1rem; justify-content: center; }
-        button { padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: all 0.2s ease; }
-        
-        #start-btn, #login-btn { background-color: var(--neon-green); color: #000; box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); flex: 2; }
-        #start-btn:hover:not(:disabled), #login-btn:hover { box-shadow: 0 0 20px rgba(57, 255, 20, 0.8); transform: translateY(-2px); }
-        #start-btn:disabled { background-color: #30363d; color: var(--text-muted); box-shadow: none; cursor: not-allowed; transform: none; }
-
-        #give-up-btn { background-color: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); flex: 1; }
-        #give-up-btn:hover { background-color: rgba(255, 51, 51, 0.1); transform: translateY(-2px); }
-
-        /* --- Modal Penalty Styles --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center;
-            justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content { background-color: #000; border: 2px solid var(--neon-red); padding: 3rem 2rem; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(255, 51, 51, 0.5); transform: scale(0.9); transition: transform 0.2s ease; }
-        .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-title { color: var(--neon-red); font-size: 1.5rem; margin-bottom: 1rem; text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 51, 51, 0.8); }
-        .modal-body { font-size: 1.1rem; line-height: 1.5; margin-bottom: 2rem; }
-        #resume-btn { background-color: var(--neon-red); color: #fff; width: 100%; }
-        #resume-btn:hover { box-shadow: 0 0 15px rgba(255, 51, 51, 0.8); }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h1>TabTamer</h1>
-        <div class="subtitle">Stay focused. Protect your Pomo-mon.</div>
-
-        <div id="login-section" class="auth-panel">
-            <button id="login-btn">Login with Google</button>
-        </div>
-
-        <div id="egg-selection" class="auth-panel" style="display: none;">
-            <p style="margin-bottom: 15px;">Choose Your Starter Egg!</p>
-            <button class="egg-btn" data-element="Fire">Fire Egg</button>
-            <button class="egg-btn" data-element="Water">Water Egg</button>
-            <button class="egg-btn" data-element="Grass">Grass Egg</button>
-        </div>
-
-        <div id="game-section" style="display: none;">
-            <div class="hp-wrapper">
-                <div class="hp-labels">
-                    <span>Pomo-mon HP</span>
-                    <span id="hp-text">100 / 100</span>
-                </div>
-                <div class="hp-bar-container">
-                    <div id="hp-fill"></div>
-                </div>
-            </div>
-
-            <div class="sprite-placeholder">
-                [ 2D SPRITE HERE ]
-                <span id="active-pomo-display">Loading...</span>
-            </div>
-
-     <script type="module">
-  // 1. Firebase Setup & Imports (Using stable version 10.10.1)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-  import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-
-  // --- 1. Configuration & Initialization ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyABcxcl0uRz_ypDjjcb_lsft0AW0TO--Ls",
-    authDomain: "pomo-mon.firebaseapp.com",
-    projectId: "pomo-mon",
-    storageBucket: "pomo-mon.firebasestorage.app",
-    messagingSenderId: "273551072268",
-    appId: "1:273551072268:web:7d5650f2b3b877c4702229",
-    measurementId: "G-909Q6HPYYE"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
-
-  // --- 2. State & Auth Variables ---
-  let currentUserId = null;
-  let activeMonsterId = null;
-  const MAX_HP = 100;
-  const PENALTY_DAMAGE = 15;
-  let isCheating = false;
-
-  // --- 3. Authentication Logic ---
-  const login = () => {
-    signInWithRedirect(auth, provider);
-  };
-
-  // This handles the user data when they return from the Google login page
-  getRedirectResult(auth)
-    .then((result) => {
-      if (result) {
-        const user = result.user;
-        currentUserId = user.uid;
-        console.log("Logged in as:", user.displayName);
-        // If you have a function to start the game UI, call it here
-        // e.g., showGameUI();
-      }
-    }).catch((error) => {
-      console.error("Auth error:", error.message);
-    });
-
-  // Attach the login function to your button after the DOM loads
-  document.addEventListener('DOMContentLoaded', () => {
-      const startBtn = document.getElementById('start-btn');
-      if (startBtn) {
-          startBtn.addEventListener('click', login);
-      }
-  });
-
-  // --- 4. DOM Elements (Continue your code below) ---
-       <div class="settings-row">
-                <label for="time-input">Focus Duration (mins):</label>
-                <input type="number" id="time-input" value="25" min="1" max="120">
-            </div>
-
-            <div class="timer-display" id="timer">25:00</div>
-
-            <div class="controls">
-                <button id="start-btn">Start Focus</button>
-                <button id="give-up-btn">Give Up</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="penalty-modal">
-        <div class="modal-content">
-            <div class="modal-title">⚠️ TAB SWITCH DETECTED! ⚠️</div>
-            <div class="modal-body">
-                Focus broken. Pomo-mon took <strong>15 Damage</strong>! 
-                Resume immediately before it faints.
-            </div>
-            <button id="resume-btn">Resume Focus</button>
-        </div>
-    </div>
-        // --- 3. DOM Elements ---
-        const loginSection = document.getElementById('login-section');
-        const eggSelection = document.getElementById('egg-selection');
-        const gameSection = document.getElementById('game-section');
-        const loginBtn = document.getElementById('login-btn');
-        const eggButtons = document.querySelectorAll('.egg-btn');
-        
-        const timerDisplay = document.getElementById('timer');
-        const startBtn = document.getElementById('start-btn');
-        const giveUpBtn = document.getElementById('give-up-btn');
-        const hpFill = document.getElementById('hp-fill');
-        const hpText = document.getElementById('hp-text');
-        const timeInput = document.getElementById('time-input');
-        
-        const modalOverlay = document.getElementById('penalty-modal');
-        const resumeBtn = document.getElementById('resume-btn');
-
-        // --- 4. Authentication & Player Ecosystem ---
-        loginBtn.addEventListener('click', () => {
-          try {
-              // Mobile-safe login method
-            signInWithRedirect(auth, googleProvider);
-         } catch (error) {
-            alert("Login initialization failed: " + error.message);
-         }
-     });
-
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUserUid = user.uid;
-                loginSection.style.display = 'none';
-                await checkPlayerEcosystem(user.uid);
-            } else {
-                currentUserUid = null;
-                loginSection.style.display = 'block';
-                eggSelection.style.display = 'none';
-                gameSection.style.display = 'none';
-            }
-        });
-
-        async function checkPlayerEcosystem(uid) {
-            const playerRef = doc(db, "players", uid);
-            const playerSnap = await getDoc(playerRef);
-
-            if (playerSnap.exists()) {
-                console.log("Returning player found.");
-                const data = playerSnap.data();
-                loadGameScreen(data.active_pomomon_id);
-            } else {
-                console.log("New player. Triggering onboarding.");
-                eggSelection.style.display = 'block';
-                gameSection.style.display = 'none';
-            }
-        }
-
-        eggButtons.forEach(button => {
-            button.addEventListener('click', async (e) => {
-                eggButtons.forEach(btn => btn.disabled = true); 
-                const element = e.target.getAttribute('data-element');
-                await claimStarterEgg(currentUserUid, element);
-            });
-        });
-
-        async function claimStarterEgg(uid, element) {
-            try {
-                const playerRef = doc(db, "players", uid);
-                const rosterCollection = collection(playerRef, "roster");
-
-                const newMonsterRef = await addDoc(rosterCollection, {
-                    species: `Egg_${element}`,
-                    current_level: 0,
-                    current_xp: 0
-                });
-
-                await setDoc(playerRef, {
-                    current_streak: 0,
-                    last_session_date: serverTimestamp(),
-                    active_pomomon_id: newMonsterRef.id
-                });
-
-                console.log(`Successfully claimed ${element} egg!`);
-                eggSelection.style.display = 'none';
-                loadGameScreen(newMonsterRef.id);
-
-            } catch (error) {
-                console.error("Error creating starter egg:", error);
-                eggButtons.forEach(btn => btn.disabled = false);
-            }
-        }
-
-        function loadGameScreen(monsterId) {
-            activeMonsterId = monsterId;
-            gameSection.style.display = 'block';
-            document.getElementById('active-pomo-display').innerText = `ID: ${activeMonsterId.slice(0, 8)}...`;
-            initGameUI();
-        }
-
-        // --- 5. Game & Timer Logic ---
-        function initGameUI() {
-            updateTimerDisplay();
-            updateHPDisplay();
-        }
-
-        timeInput.addEventListener('change', (e) => {
-            if (!isRunning) {
-                let mins = parseInt(e.target.value);
-                if (isNaN(mins) || mins < 1) { mins = 1; e.target.value = 1; }
-                if (mins > 120) { mins = 120; e.target.value = 120; }
-                timeLeft = mins * 60;
-                updateTimerDisplay();
-            }
-        });
-
-        function startTimer() {
-            if (timeLeft <= 0 || currentHP <= 0) return;
-            
-            isRunning = true;
-            isCheating = false;
-            
-            startBtn.innerText = "Focusing...";
-            startBtn.disabled = true;
-            timeInput.disabled = true;
-            
-            startPings();
-
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                if (timeLeft <= 0) completeSession();
-            }, 1000);
-        }
-
-        function stopTimerVariables() {
-            isRunning = false;
-            clearInterval(timerInterval);
-            clearInterval(pingInterval);
-        }
-
-        async function completeSession() {
-            stopTimerVariables();
-            
-            if (!isCheating) {
-                try {
-                    // Correctly route XP to the actual active Pomo-mon in Firestore!
-                    const monsterRef = doc(db, "players", currentUserUid, "roster", activeMonsterId);
-                    await setDoc(monsterRef, { current_xp: increment(50) }, { merge: true });
-                    
-                    console.log("Server Ping: Session verified! +50 XP securely awarded.");
-                    alert("Session Complete! +50 XP logged to your Pomo-mon.");
-                } catch (error) {
-                    console.error("Failed to update XP:", error);
-                    alert("DB Error: " + error.message);
-                }
-            } else {
-                alert("Session Finished, but XP was forfeited due to tab switching.");
-            }
-            resetSession();
-        }
-
-        function giveUp() {
-            if (!confirm("Are you sure you want to give up? Your Pomo-mon will lose all its HP.")) return;
-            stopTimerVariables();
-            currentHP = 0;
-            updateHPDisplay();
-            setTimeout(() => {
-                alert("You gave up. Pomo-mon fainted.");
-                resetSession();
-            }, 500);
-        }
-
-        function resetSession() {
-            stopTimerVariables();
-            const mins = parseInt(timeInput.value) || 25;
-            timeLeft = mins * 60;
-            currentHP = MAX_HP;
-            isCheating = false;
-            updateTimerDisplay();
-            updateHPDisplay();
-            
-            startBtn.innerText = "Start Focus";
-            startBtn.disabled = false;
-            timeInput.disabled = false;
-            resumeBtn.style.display = 'inline-block';
-        }
-
-        // --- 6. Tracking & Tab Detection ---
-        function startPings() {
-            logActivityToServer(); 
-            pingInterval = setInterval(() => {
-                if (!isCheating && isRunning) logActivityToServer();
-            }, 60000); 
-        }
-
-        async function logActivityToServer() {
-            try {
-                // Keep pinging the main player doc so we know they are active
-                const playerRef = doc(db, "players", currentUserUid);
-                await setDoc(playerRef, { lastPing: serverTimestamp() }, { merge: true });
-            } catch (error) {
-                console.error("Ping failed.", error);
-            }
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function updateHPDisplay() {
-            currentHP = Math.max(0, Math.min(currentHP, MAX_HP));
-            const hpPercentage = (currentHP / MAX_HP) * 100;
-            hpFill.style.width = `${hpPercentage}%`;
-            hpText.innerText = `${currentHP} / ${MAX_HP}`;
-
-            if (hpPercentage <= 30) {
-                hpFill.style.backgroundColor = "var(--neon-red)";
-                hpFill.style.boxShadow = "0 0 10px var(--neon-red)";
-            } else if (hpPercentage <= 60) {
-                hpFill.style.backgroundColor = "#ffae42"; 
-                hpFill.style.boxShadow = "0 0 10px #ffae42";
-            } else {
-                hpFill.style.backgroundColor = "var(--neon-green)";
-                hpFill.style.boxShadow = "0 0 10px var(--neon-green)";
-            }
-        }
-
-        function handleFocusLost() {
-            if (!isRunning) return;
-            stopTimerVariables();
-            isCheating = true; 
-            currentHP -= PENALTY_DAMAGE;
-            updateHPDisplay();
-            modalOverlay.classList.add('active');
-
-            if (currentHP <= 0) {
-                resumeBtn.style.display = 'none'; 
-                setTimeout(() => {
-                    modalOverlay.classList.remove('active');
-                    alert("Zero HP reached. Pomo-mon has fainted due to lack of focus!");
-                    resetSession();
-                }, 1500);
-            }
-        }
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') handleFocusLost();
-        });
-
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') handleFocusLost(); });
         window.addEventListener('blur', () => { handleFocusLost(); });
-
-        // --- 7. Event Listeners ---
-        startBtn.addEventListener('click', () => {
-            if (!isRunning) startTimer();
-        });
-        
+        startBtn.addEventListener('click', () => { if (!isRunning) startTimer(); });
         giveUpBtn.addEventListener('click', giveUp);
-        
-        resumeBtn.addEventListener('click', () => {
-            modalOverlay.classList.remove('active');
-            if (currentHP > 0 && timeLeft > 0) {
-                startTimer(); 
-            }
-        });
+        resumeBtn.addEventListener('click', () => { modalOverlay.classList.remove('active'); if (currentHP > 0 && timeLeft > 0) startTimer(); });
     </script>
 </body>
 </html>
