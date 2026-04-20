@@ -151,7 +151,64 @@
                 <span id="active-pomo-display">Loading...</span>
             </div>
 
-            <div class="settings-row">
+     <script type="module">
+  // 1. Firebase Setup & Imports (Using stable version 10.10.1)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-app.js";
+  import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.10.1/firebase-firestore.js";
+
+  // --- 1. Configuration & Initialization ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyABcxcl0uRz_ypDjjcb_lsft0AW0TO--Ls",
+    authDomain: "pomo-mon.firebaseapp.com",
+    projectId: "pomo-mon",
+    storageBucket: "pomo-mon.firebasestorage.app",
+    messagingSenderId: "273551072268",
+    appId: "1:273551072268:web:7d5650f2b3b877c4702229",
+    measurementId: "G-909Q6HPYYE"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  // --- 2. State & Auth Variables ---
+  let currentUserId = null;
+  let activeMonsterId = null;
+  const MAX_HP = 100;
+  const PENALTY_DAMAGE = 15;
+  let isCheating = false;
+
+  // --- 3. Authentication Logic ---
+  const login = () => {
+    signInWithRedirect(auth, provider);
+  };
+
+  // This handles the user data when they return from the Google login page
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result) {
+        const user = result.user;
+        currentUserId = user.uid;
+        console.log("Logged in as:", user.displayName);
+        // If you have a function to start the game UI, call it here
+        // e.g., showGameUI();
+      }
+    }).catch((error) => {
+      console.error("Auth error:", error.message);
+    });
+
+  // Attach the login function to your button after the DOM loads
+  document.addEventListener('DOMContentLoaded', () => {
+      const startBtn = document.getElementById('start-btn');
+      if (startBtn) {
+          startBtn.addEventListener('click', login);
+      }
+  });
+
+  // --- 4. DOM Elements (Continue your code below) ---
+       <div class="settings-row">
                 <label for="time-input">Focus Duration (mins):</label>
                 <input type="number" id="time-input" value="25" min="1" max="120">
             </div>
@@ -175,64 +232,6 @@
             <button id="resume-btn">Resume Focus</button>
         </div>
     </div>
-
-    <script type="module">
-  // 1. Firebase Setup & Imports
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
-  import { getAuth, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSy...", // Keep your existing keys here
-    authDomain: "pomo-mon.firebaseapp.com",
-    projectId: "pomo-mon",
-    storageBucket: "pomo-mon.firebasestorage.app",
-    messagingSenderId: "273551072268",
-    appId: "1:273551072268:web:7d5650f2b3b877c4702229",
-    measurementId: "G-909Q6HPYYE"
-  };
-
-  // Initialize Firebase FIRST
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
-
-  // 2. Auth Logic
-  const login = () => {
-    signInWithRedirect(auth, provider);
-  };
-
-  // Catch the result after redirecting back to the site
-  getRedirectResult(auth)
-    .then((result) => {
-      if (result) {
-        const user = result.user;
-        console.log("Logged in as:", user.displayName);
-        // Set your global user variable here
-        currentUserId = user.uid; 
-      }
-    }).catch((error) => {
-      console.error("Auth error:", error);
-    });
-
-  // ... 3. Rest of your state & variables ...
-
-        // --- 2. State & Variables ---
-        // Player & Auth State
-        let currentUserUid = null;
-        let activeMonsterId = null;
-
-        // Game State
-        const MAX_HP = 100;
-        const PENALTY_DAMAGE = 15;
-        let timeLeft = 25 * 60; // Default 25 minutes
-        let currentHP = MAX_HP;
-        let isRunning = false;
-        let timerInterval = null;
-        let pingInterval = null;
-        let isCheating = false;
-
         // --- 3. DOM Elements ---
         const loginSection = document.getElementById('login-section');
         const eggSelection = document.getElementById('egg-selection');
