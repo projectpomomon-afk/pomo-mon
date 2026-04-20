@@ -125,6 +125,20 @@
 </head>
 <body>
 
+        <div id="mobile-debug" style="background: #ff3333; color: white; padding: 10px; font-size: 12px; z-index: 9999; position: absolute; top: 0; left: 0; width: 100%; word-wrap: break-word;">
+        System Status: Ready. Waiting for errors...
+    </div>
+    <script>
+        // Catch standard errors
+        window.onerror = function(message, source, lineno, colno, error) {
+            document.getElementById('mobile-debug').innerHTML += `<br>❌ Error: ${message}`;
+            return false;
+        };
+        // Catch Firebase Promise errors (like database failures)
+        window.addEventListener('unhandledrejection', function(event) {
+            document.getElementById('mobile-debug').innerHTML += `<br>⚠️ Firebase Error: ${event.reason}`;
+        });
+    </script>
     <div class="container">
         <h1>TabTamer</h1>
         <div class="subtitle">Stay focused. Protect your Pomo-mon.</div>
