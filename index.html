@@ -45,17 +45,6 @@
         .hp-bar-container { width: 100%; height: 24px; background-color: #21262d; border: 2px solid #30363d; border-radius: 12px; overflow: hidden; position: relative; }
         #hp-fill { height: 100%; width: 100%; background-color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.4s ease, background-color 0.4s ease; }
 
-        .sprite-placeholder {
-            width: 150px; height: 150px; margin: 0 auto 2rem auto; border: 2px dashed var(--neon-green);
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            color: var(--neon-green); font-family: monospace; font-size: 0.8rem;
-            background: rgba(57, 255, 20, 0.05); text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
-            animation: pulse 2s infinite; flex-direction: column;
-        }
-        #active-pomo-display { margin-top: 10px; font-size: 0.7rem; color: var(--text-muted); text-shadow: none; }
-
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.2); } 70% { box-shadow: 0 0 0 15px rgba(57, 255, 20, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); } }
-
         .settings-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; }
         .settings-row input { background-color: #0d1117; border: 1px solid #30363d; color: var(--neon-green); padding: 0.3rem; border-radius: 4px; width: 60px; text-align: center; font-weight: bold; font-family: monospace; }
         .settings-row input:focus { outline: none; border-color: var(--neon-green); }
@@ -80,6 +69,265 @@
         .modal-title { color: var(--neon-red); font-size: 1.5rem; margin-bottom: 1rem; text-transform: uppercase; }
         .modal-body { font-size: 1.1rem; line-height: 1.5; margin-bottom: 2rem; }
         #resume-btn { background-color: var(--neon-red); color: #fff; width: 100%; }
+
+        /* --- SPRINT 4 UI/UX OVERHAUL --- */
+
+        /* 1. Navigation & Farm Layout */
+        .nav-bar { display: flex; gap: 10px; margin-bottom: 2rem; border-bottom: 2px solid #30363d; padding-bottom: 10px; justify-content: center;}
+        .nav-btn { background: transparent; color: var(--text-muted); border: none; font-size: 1.1rem; padding: 0.5rem 1rem; cursor: pointer; transition: 0.3s; position: relative;}
+        .nav-btn:hover { color: var(--text-main); }
+        .nav-btn.active { color: var(--neon-green); text-shadow: 0 0 10px rgba(57,255,20,0.5); }
+        .nav-btn.active::after { content: ''; position: absolute; bottom: -12px; left: 0; width: 100%; height: 2px; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+        #farm-section { width: 100%; animation: fadeIn 0.3s ease; }
+        .farm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-top: 1rem; max-height: 400px; overflow-y: auto; padding: 10px; }
+        .farm-grid::-webkit-scrollbar { width: 6px; }
+        .farm-grid::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+
+        /* 2. Roster Cards (Glassmorphism + Hover Physics) */
+        .pomo-card { background: rgba(22, 27, 34, 0.7); border: 1px solid #30363d; border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(5px); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+        .pomo-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: #4b5563; }
+        .pomo-card.equipped { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57, 255, 20, 0.1) inset; }
+        .pomo-card img { width: 80px; height: 80px; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+        .pomo-card h3 { font-size: 0.9rem; margin-bottom: 5px; color: var(--text-main); text-transform: capitalize; }
+        .pomo-card p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; font-family: monospace; }
+        .equip-btn { font-size: 0.8rem; padding: 0.4rem 0.8rem; background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); width: 100%; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .equip-btn:hover:not(:disabled) { background: rgba(57, 255, 20, 0.2); }
+        .equip-btn:disabled { border-color: #30363d; color: #30363d; cursor: not-allowed; }
+
+        /* 3. Sprite Renderer & Arena Polish */
+        .sprite-placeholder { background: transparent; border: none; box-shadow: none; animation: float 3s ease-in-out infinite; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 150px; margin: 0 auto 2rem auto;}
+        .pomo-sprite { width: 120px; height: 120px; filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.3)); transition: filter 0.3s; }
+
+        /* 4. Visceral Micro-Animations */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes damageShake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
+        .damage-shake { animation: damageShake 0.4s cubic-bezier(.36,.07,.19,.97) both !important; filter: hue-rotate(-90deg) brightness(1.5) drop-shadow(0 0 20px red) !important; }
+
+        /* Screen Flash for Tab-Switching Penalty */
+        body.flash-red::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 51, 51, 0.3); z-index: 999; pointer-events: none; animation: flashOut 0.5s ease-out forwards; }
+        @keyframes flashOut { from { opacity: 1; } to { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div id="mobile-debug" style="background: #ff3333; color: white; padding: 10px; font-size: 12px; z-index: 9999; position: absolute; top: 0; left: 0; width: 100%; word-wrap: break-word; display: none;">
+        System Status: Ready. Waiting for errors...
+    </div>
+    <script>
+        window.onerror = function(message) { document.getElementById('mobile-debug').style.display = 'block'; document.getElementById('mobile-debug').innerHTML += `<br>❌ Error: ${message}`; return false; };
+        window.addEventListener('unhandledrejection', function(event) { document.getElementById('mobile-debug').style.display = 'block'; document.getElementById('mobile-debug').innerHTML += `<br>⚠️ Firebase Error: ${event.reason}`; });
+    </script>
+
+    <div class="container">
+        <h1>TabTamer</h1>
+        <div class="subtitle">Stay focused. Protect your Pomo-mon.</div>
+
+        <div id="login-section" class="auth-panel">
+            <input type="email" id="email-input" class="auth-input" placeholder="Email Address">
+            <input type="password" id="password-input" class="auth-input" placeholder="Password">
+            <div class="auth-buttons">
+                <button id="login-btn">Log In</button>
+                <button id="signup-btn">Create Account</button>
+            </div>
+        </div>
+
+        <div id="egg-selection" class="auth-panel" style="display: none;">
+            <p style="margin-bottom: 15px;">Choose Your Starter Egg!</p>
+            <button class="egg-btn" data-element="Fire">Fire Egg</button>
+            <button class="egg-btn" data-element="Water">Water Egg</button>
+            <button class="egg-btn" data-element="Grass">Grass Egg</button>
+        </div>
+
+        <div id="nav-bar" class="nav-bar" style="display: none;">
+            <button id="nav-arena" class="nav-btn active">Focus Arena</button>
+            <button id="nav-farm" class="nav-btn">The Farm</button>
+        </div>
+
+        <div id="game-section" style="display: none;">
+            <div class="hp-wrapper">
+                <div class="hp-labels"><span>Pomo-mon HP</span><span id="hp-text">100 / 100</span></div>
+                <div class="hp-bar-container"><div id="hp-fill"></div></div>
+            </div>
+            
+            <div id="sprite-renderer" class="sprite-placeholder">
+                <span id="active-pomo-display">Initializing Matrix...</span>
+            </div>
+            
+            <div class="settings-row"><label for="time-input">Focus Duration (mins):</label><input type="number" id="time-input" value="25" min="1" max="120"></div>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="controls"><button id="start-btn">Start Focus</button><button id="give-up-btn">Give Up</button></div>
+        </div>
+
+        <div id="farm-section" style="display: none;">
+            <h2 style="font-size: 1.2rem; color: var(--text-main); margin-bottom: 5px;">Incubation & Roster</h2>
+            <div class="subtitle" style="margin-bottom: 0;">Equip monsters to level them up.</div>
+            <div id="farm-grid" class="farm-grid">
+                </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="penalty-modal">
+        <div class="modal-content">
+            <div class="modal-title">⚠️ TAB SWITCH DETECTED! ⚠️</div>
+            <div class="modal-body">Focus broken. Pomo-mon took <strong>15 Damage</strong>! Resume immediately before it faints.</div>
+            <button id="resume-btn">Resume Focus</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // 1. Fixed and Verified Version 10.12.0
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, increment, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // 2. Your Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyABCxcL0uRz_ypOjjCb_lsft0AWOTO--Ls",
+            authDomain: "pomo-mon.firebaseapp.com",
+            projectId: "pomo-mon",
+            storageBucket: "pomo-mon.firebasestorage.app",
+            messagingSenderId: "273551072268",
+            appId: "1:273551072268:web:7d5650f2b3b877c4702229",
+            measurementId: "G-9G9Q6HFYYE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserUid = null;
+        let activeMonsterId = null;
+        const MAX_HP = 100;
+        const PENALTY_DAMAGE = 15;
+        let currentHP = MAX_HP;
+        let timeLeft = 25 * 60;
+        let isRunning = false;
+        let isCheating = false;
+        let timerInterval;
+        let pingInterval;
+
+        const loginSection = document.getElementById('login-section');
+        const eggSelection = document.getElementById('egg-selection');
+        const gameSection = document.getElementById('game-section');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const eggButtons = document.querySelectorAll('.egg-btn');
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('start-btn');
+        const giveUpBtn = document.getElementById('give-up-btn');
+        const hpFill = document.getElementById('hp-fill');
+        const hpText = document.getElementById('hp-text');
+        const timeInput = document.getElementById('time-input');
+        const modalOverlay = document.getElementById('penalty-modal');
+        const resumeBtn = document.getElementById('resume-btn');
+
+        // --- SPRINT 4 JS INJECTIONS ---
+        const navBar = document.getElementById('nav-bar');
+        const navArenaBtn = document.getElementById('nav-arena');
+        const navFarmBtn = document.getElementById('nav-farm');
+        const farmSection = document.getElementById('farm-section');
+        const farmGrid = document.getElementById('farm-grid');
+        const spriteRenderer = document.getElementById('sprite-renderer');
+
+        // Navigation Listeners
+        navArenaBtn.addEventListener('click', () => {
+            if (isRunning) return; // Prevent switching while focusing
+            navFarmBtn.classList.remove('active'); navArenaBtn.classList.add('active');
+            farmSection.style.display = 'none'; gameSection.style.display = 'block';
+        });
+
+        navFarmBtn.addEventListener('click', () => {
+            if (isRunning) return alert("You are locked in! Finish or Give Up before checking the Farm.");
+            navArenaBtn.classList.remove('active'); navFarmBtn.classList.add('active');
+            gameSection.style.display = 'none'; farmSection.style.display = 'block';
+            loadFarmRoster();
+        });
+
+        // Procedural Sprite Generator (using Dicebear Bottts)
+        function generateSpriteUrl(seed) {
+            return `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&baseColor=0d1117&primaryColor=39ff14`;
+        }
+
+        // OVERRIDE `loadGameScreen` to fetch species and render sprite
+        // (Function declaration used here instead of window assignment to ensure seamless local scope module behavior)
+        async function loadGameScreen(monsterId) {
+            activeMonsterId = monsterId;
+            eggSelection.style.display = 'none';
+            gameSection.style.display = 'block';
+            navBar.style.display = 'flex'; // Show nav when in game
+            
+            // Fetch Active Monster Data to get Species
+            try {
+                const monsterRef = doc(db, "players", currentUserUid, "roster", monsterId);
+                const snap = await getDoc(monsterRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const speciesName = data.species.replace('_', ' ');
+                    
+                    // Render the dynamic sprite
+                    spriteRenderer.innerHTML = `
+                        <img src="${generateSpriteUrl(data.species)}" alt="sprite" class="pomo-sprite" id="active-sprite-img">
+                        <span id="active-pomo-display" style="font-weight:bold; margin-top:10px;">${speciesName}</span>
+                    `;
+                }
+            } catch(e) { console.error("Sprite load failed:", e); }
+
+            updateTimerDisplay(); updateHPDisplay();
+        }
+
+        // The Farm UI Loader
+        async function loadFarmRoster() {
+            farmGrid.innerHTML = `<p style="grid-column: 1/-1; color: var(--text-muted);">Syncing with Firestore...</p>`;
+            try {
+                const rosterRef = collection(db, "players", currentUserUid, "roster");
+                const snapshot = await getDocs(rosterRef);
+                farmGrid.innerHTML = ''; 
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    const isEquipped = (id === activeMonsterId);
+                    
+                    const card = document.createElement('div');
+                    card.className = `pomo-card ${isEquipped ? 'equipped' : ''}`;
+                    card.innerHTML = `
+                        <img src="${generateSpriteUrl(data.species)}" alt="sprite">
+                        <h3>${data.species.replace('_', ' ')}</h3>
+                        <p>XP: ${data.current_xp}</p>
+                        <button class="equip-btn" ${isEquipped ? 'disabled' : ''}>
+                            ${isEquipped ? 'Active Target' : 'Equip Mon'}
+                        </button>
+                    `;
+                    
+                    if (!isEquipped) {
+                        card.querySelector('.equip-btn').addEventListener('click', async () => {
+                            try {
+                                card.querySelector('.equip-btn').innerText = "Equipping...";
+                                await updateDoc(doc(db, "players", currentUserUid), { active_pomomon_id: id });
+                                loadGameScreen(id); // Reload Arena with new mon
+                                        .pomo-card h3 { font-size: 0.9rem; margin-bottom: 5px; color: var(--text-main); text-transform: capitalize; }
+        .pomo-card p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; font-family: monospace; }
+        .equip-btn { font-size: 0.8rem; padding: 0.4rem 0.8rem; background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); width: 100%; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .equip-btn:hover:not(:disabled) { background: rgba(57, 255, 20, 0.2); }
+        .equip-btn:disabled { border-color: #30363d; color: #30363d; cursor: not-allowed; }
+
+        /* 3. Sprite Renderer & Arena Polish */
+        .sprite-placeholder { background: transparent; border: none; box-shadow: none; animation: float 3s ease-in-out infinite; }
+        .pomo-sprite { width: 120px; height: 120px; filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.3)); transition: filter 0.3s; }
+
+        /* 4. Visceral Micro-Animations */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes damageShake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 70% { transform: translate(3px, 1px) rotate(-1deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 90% { transform: translate(1px, 2px) rotate(0deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
+        .damage-shake { animation: damageShake 0.4s cubic-bezier(.36,.07,.19,.97) both !important; filter: hue-rotate(-90deg) brightness(1.5) drop-shadow(0 0 20px red) !important; }
+
+        /* Screen Flash for Tab-Switching Penalty */
+        body.flash-red::before { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 51, 51, 0.3); z-index: 999; pointer-events: none; animation: flashOut 0.5s ease-out forwards; }
+        @keyframes flashOut { from { opacity: 1; } to { opacity: 0; } }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
     </style>
 </head>
 <body>
