@@ -12,135 +12,236 @@
             --neon-red: #ff3333;
             --text-main: #e6edf3;
             --text-muted: #8b949e;
+
+            /* SPRITE MATH */
+            --frame-width: 118px; 
+            --frame-height: 120px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg-color); color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; min-height: 100vh; overflow-x: hidden;
         }
 
         .container {
             background-color: var(--panel-bg); border: 1px solid #30363d;
-            border-radius: 12px; padding: 2rem; width: 95%;
+            border-radius: 12px; padding: 1.5rem; width: 95%;
             max-width: 450px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            margin: 20px auto;
         }
 
-        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-main); }
-        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        /* --- SPRITE ANIMATION ENGINE --- */
+        .sprite-viewport {
+            width: var(--frame-width);
+            height: var(--frame-height);
+            background-repeat: no-repeat;
+            background-position: 0px 0px;
+            background-size: calc(var(--frame-width) * 4) var(--frame-height);
+            filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.3));
+            margin: 0 auto;
+            image-rendering: pixelated;
+        }
 
-        .auth-panel { margin-bottom: 2rem; }
-        .auth-input { width: 100%; padding: 0.8rem; margin-bottom: 10px; background-color: #0d1117; border: 1px solid #30363d; color: var(--text-main); border-radius: 6px; }
-        .auth-input:focus { outline: none; border-color: var(--neon-green); box-shadow: 0 0 5px rgba(57, 255, 20, 0.3); }
-        .auth-buttons { display: flex; gap: 10px; margin-top: 10px; }
-        
-        .egg-btn { margin: 5px; padding: 0.8rem; background-color: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); border-radius: 6px; cursor: pointer; flex: 1; font-size: 0.8rem; }
-        .egg-btn:hover { background-color: rgba(57, 255, 20, 0.1); }
+        .state-idle { background-image: url('idle_strip.png'); animation: play-sprite 0.8s steps(4) infinite; }
+        .state-walk { background-image: url('walk_strip.png'); animation: play-sprite 0.8s steps(4) infinite; }
+        .state-attack { background-image: url('attack_strip.png'); animation: play-sprite 0.6s steps(4) 1 forwards; }
 
+        @keyframes play-sprite {
+            100% { background-position: calc(var(--frame-width) * -4) 0px; }
+        }
+
+        /* --- UI COMPONENTS --- */
         .hp-wrapper { margin-bottom: 1.5rem; text-align: left; }
         .hp-labels { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        .hp-bar-container { width: 100%; height: 24px; background-color: #21262d; border: 2px solid #30363d; border-radius: 12px; overflow: hidden; position: relative; }
-        #hp-fill { height: 100%; width: 100%; background-color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.4s ease, background-color 0.4s ease; }
+        .hp-bar-container { width: 100%; height: 20px; background-color: #21262d; border: 2px solid #30363d; border-radius: 10px; overflow: hidden; }
+        #hp-fill { height: 100%; width: 100%; background-color: var(--neon-green); transition: width 0.4s ease; }
 
-        .nav-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 2px solid #30363d; padding-bottom: 10px; justify-content: center;}
-        .nav-btn { background: transparent; color: var(--text-muted); border: none; font-size: 1rem; padding: 0.5rem 0.8rem; cursor: pointer; transition: 0.3s; position: relative;}
-        .nav-btn.active { color: var(--neon-green); text-shadow: 0 0 10px rgba(57,255,20,0.5); }
-        .nav-btn.active::after { content: ''; position: absolute; bottom: -12px; left: 0; width: 100%; height: 2px; background: var(--neon-green); }
+        .auth-input { width: 100%; padding: 0.8rem; margin-bottom: 10px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 6px; }
+        .nav-bar { display: none; gap: 10px; margin-bottom: 1.5rem; justify-content: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .nav-btn { background: none; color: var(--text-muted); border: none; cursor: pointer; font-weight: bold; padding: 5px 10px; }
+        .nav-btn.active { color: var(--neon-green); border-bottom: 2px solid var(--neon-green); }
 
-        .sprite-placeholder { min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite; }
-        .pomo-sprite { width: 120px; height: 120px; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.3)); }
-        
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .timer-display { font-size: 3.5rem; font-weight: bold; font-family: monospace; margin: 1rem 0; }
+        button { padding: 0.8rem 1.2rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; text-transform: uppercase; }
+        #start-btn { background: var(--neon-green); color: black; width: 60%; }
+        #give-up-btn { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); width: 35%; }
 
-        .timer-display { font-size: 3.5rem; font-weight: 700; font-family: monospace; margin-bottom: 1.5rem; }
-        .controls { display: flex; gap: 1rem; justify-content: center; }
-        button { padding: 0.8rem 1.2rem; font-size: 0.9rem; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; border: none; }
-        
-        #start-btn, #login-btn { background-color: var(--neon-green); color: #000; flex: 2; }
-        #give-up-btn, #signup-btn { background-color: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); flex: 1; }
-        #signup-btn { color: var(--neon-green); border-color: var(--neon-green); }
-
-        .farm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 1rem; max-height: 300px; overflow-y: auto; }
-        .pomo-card { background: rgba(22, 27, 34, 0.7); border: 1px solid #30363d; border-radius: 12px; padding: 10px; text-align: center; }
-        .pomo-card.equipped { border-color: var(--neon-green); }
-        .pomo-card img { width: 60px; height: 60px; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:9999; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background-color: #000; border: 2px solid var(--neon-red); padding: 2rem; border-radius: 12px; max-width: 320px; text-align: center; }
 
-        #mobile-debug { background: #ff3333; color: white; padding: 10px; font-size: 11px; width: 100%; word-wrap: break-word; position: fixed; top: 0; z-index: 10000; }
+        /* --- RETRO GBA FARM SECTION --- */
+        #farm-section {
+            background-color: #e0f8cf; /* Classic GB light Green */
+            border: 4px solid #306230; 
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+            color: #081820;
+            image-rendering: pixelated;
+        }
+
+        .gba-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 4px;
+            background-color: #9bbc0f;
+            padding: 4px;
+            border: 2px solid #306230;
+            margin-bottom: 15px;
+        }
+
+        .gba-cell {
+            aspect-ratio: 1;
+            background-color: #e0f8cf;
+            border: 1px solid #8bac0f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gba-cell.selected {
+            outline: 3px solid #f83800; /* Retro red cursor */
+            z-index: 2;
+        }
+
+        .farm-sprite-icon {
+            width: 40px;
+            height: 40px;
+            background-image: url('idle_strip.png');
+            background-size: 160px 40px; /* 4 frames scaled down */
+            background-repeat: no-repeat;
+            image-rendering: pixelated;
+        }
+
+        .summary-menu {
+            background: #ffffff;
+            border: 3px double #306230;
+            padding: 10px;
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+        }
+
+        .summary-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .gba-btn {
+            background: #8bac0f;
+            border: 2px solid #306230;
+            color: #081820;
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            flex: 1;
+        }
+
+        #mobile-debug { background: #39ff14; color: black; padding: 5px; font-size: 10px; position: fixed; top: 0; width: 100%; z-index: 10000; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="mobile-debug">System Status: Ready. Waiting for errors...</div>
+    <div id="mobile-debug">System Status: Ready</div>
 
     <div class="container">
         <h1>TabTamer</h1>
-        <div class="subtitle">Stay focused. Protect your Pomo-mon.</div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1.5rem;">Protect your Pomo-mon</p>
 
-        <div id="login-section" class="auth-panel">
-            <input type="email" id="email-input" class="auth-input" placeholder="Email Address">
+        <!-- Auth Section -->
+        <div id="login-section">
+            <input type="email" id="email-input" class="auth-input" placeholder="Email">
             <input type="password" id="password-input" class="auth-input" placeholder="Password">
-            <div class="auth-buttons">
-                <button id="login-btn">Log In</button>
-                <button id="signup-btn">Create</button>
+            <div style="display:flex; gap:10px;">
+                <button id="login-btn" style="background:var(--neon-green); flex:1;">Log In</button>
+                <button id="signup-btn" style="border:1px solid var(--neon-green); color:var(--neon-green); background:transparent; flex:1;">Signup</button>
             </div>
         </div>
 
-        <div id="egg-selection" class="auth-panel" style="display: none;">
-            <p style="margin-bottom: 15px;">Choose Your Starter Egg!</p>
-            <div style="display:flex;">
-                <button class="egg-btn" data-element="Fire">Fire</button>
-                <button class="egg-btn" data-element="Water">Water</button>
-                <button class="egg-btn" data-element="Grass">Grass</button>
+        <!-- Egg Selection (Restored) -->
+        <div id="egg-selection" style="display: none;">
+            <p style="margin-bottom: 1rem;">Pick Your Starter Egg</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="egg-btn" data-type="Fire" style="background:#ff4500; color:white;">FIRE</button>
+                <button class="egg-btn" data-type="Water" style="background:#1e90ff; color:white;">WATER</button>
+                <button class="egg-btn" data-type="Grass" style="background:#32cd32; color:white;">GRASS</button>
             </div>
         </div>
 
-        <div id="nav-bar" class="nav-bar" style="display: none;">
-            <button id="nav-arena" class="nav-btn active">Arena</button>
-            <button id="nav-farm" class="nav-btn">Farm</button>
+        <!-- App Nav -->
+        <div id="nav-bar" class="nav-bar">
+            <button id="nav-arena" class="nav-btn active">ARENA</button>
+            <button id="nav-farm" class="nav-btn">FARM</button>
         </div>
 
+        <!-- Arena Section -->
         <div id="game-section" style="display: none;">
             <div class="hp-wrapper">
                 <div class="hp-labels"><span>HP</span><span id="hp-text">100 / 100</span></div>
                 <div class="hp-bar-container"><div id="hp-fill"></div></div>
             </div>
-            
-            <div id="sprite-renderer" class="sprite-placeholder">
-                <span id="active-pomo-display">Loading Sprite...</span>
-            </div>
-            
-            <div class="settings-row" style="margin-bottom:10px; font-size:0.8rem; color:var(--text-muted);">
-                Focus (mins): <input type="number" id="time-input" value="25" min="1" max="120" style="background:#0d1117; color:var(--neon-green); border:1px solid #30363d; width:50px; border-radius:4px;">
-            </div>
-            <div class="timer-display" id="timer">25:00</div>
-            <div class="controls"><button id="start-btn">Start</button><button id="give-up-btn">Give Up</button></div>
-        </div>
 
-        <div id="farm-section" style="display: none;">
-            <div id="farm-grid" class="farm-grid"></div>
+            <div id="sprite-renderer" style="min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div id="active-sprite-img" class="sprite-viewport state-idle"></div>
+                <div id="active-species-name" style="font-weight:bold; color:var(--neon-green); margin-top:10px;">---</div>
+            </div>
+
+            <div style="margin-top: 10px; font-size: 0.8rem;">
+                Focus (Mins): <input type="number" id="time-input" value="25" min="1" style="background:#0d1117; color:var(--neon-green); border:1px solid #333; width:50px;">
+            </div>
+
+            <div class="timer-display" id="timer">25:00</div>
+
+            <div style="display: flex; justify-content: space-between;">
+                <button id="start-btn">Start Session</button>
+                <button id="give-up-btn">Give Up</button>
+            </div>
+        </div>
+        
+        <!-- Retro Farm Section (Upgraded) -->
+        <div id="farm-section">
+            <div style="margin-bottom: 10px; font-weight: bold; display: flex; justify-content: space-between;">
+                <span>BOX 1</span>
+                <span>30/30</span>
+            </div>
+            
+            <div class="gba-grid" id="farm-grid">
+                <!-- 30 cells generated by JS -->
+            </div>
+
+            <div id="summary-panel" class="summary-menu" style="display: none;">
+                <div id="summary-data">
+                    <strong>SPECIES:</strong> <span id="sum-species">-</span><br>
+                    <strong>HP:</strong> <span id="sum-hp">-</span><br>
+                    <strong>XP:</strong> <span id="sum-xp">-</span>
+                </div>
+                <div class="summary-btn-group">
+                    <button class="gba-btn" id="equip-btn">EQUIP</button>
+                    <button class="gba-btn" id="cancel-btn">CANCEL</button>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Penalty Modal -->
     <div class="modal-overlay" id="penalty-modal">
-        <div class="modal-content">
-            <div style="color:var(--neon-red); font-weight:bold; margin-bottom:10px;">TAB SWITCH DETECTED!</div>
-            <div style="margin-bottom:1.5rem; font-size:0.9rem;">Pomo-mon took 15 Damage!</div>
-            <button id="resume-btn" style="background:var(--neon-red); color:white; width:100%;">Resume</button>
+        <div style="background:#000; padding:2rem; border:2px solid var(--neon-red); border-radius:12px; text-align:center;">
+            <h2 style="color:var(--neon-red);">TAB SWITCHED!</h2>
+            <p style="margin: 15px 0;">Your Pomo-mon took 15 damage!</p>
+            <button id="resume-btn" style="background:var(--neon-red); color:white; width:100%;">Resume Focus</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, increment, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, increment, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyABCxcL0uRz_ypOjjCb_lsft0AWOTO--Ls",
@@ -155,195 +256,220 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Core State
         let currentUserUid = null;
         let activeMonsterId = null;
         let currentHP = 100;
         let timeLeft = 25 * 60;
         let isRunning = false;
-        let isCheating = false;
         let timerInterval;
+        let selectedFarmId = null;
 
-        // UI Selectors
-        const debugBar = document.getElementById('mobile-debug');
-        const loginSection = document.getElementById('login-section');
-        const eggSelection = document.getElementById('egg-selection');
-        const gameSection = document.getElementById('game-section');
-        const navBar = document.getElementById('nav-bar');
-        const farmSection = document.getElementById('farm-section');
-        const spriteRenderer = document.getElementById('sprite-renderer');
+        const spriteImg = document.getElementById('active-sprite-img');
         const timerDisplay = document.getElementById('timer');
-        const startBtn = document.getElementById('start-btn');
         const hpFill = document.getElementById('hp-fill');
         const hpText = document.getElementById('hp-text');
 
-        // Helper: Log Errors to UI
-        window.onerror = (m) => { debugBar.innerHTML = "❌ " + m; debugBar.style.background = "red"; };
-
-        // Navigation
-        document.getElementById('nav-arena').onclick = () => {
-            if(isRunning) return;
-            document.getElementById('nav-farm').classList.remove('active');
-            document.getElementById('nav-arena').classList.add('active');
-            farmSection.style.display = 'none'; gameSection.style.display = 'block';
-        };
-
-        document.getElementById('nav-farm').onclick = () => {
-            if(isRunning) return alert("Finish your focus session first!");
-            document.getElementById('nav-arena').classList.remove('active');
-            document.getElementById('nav-farm').classList.add('active');
-            gameSection.style.display = 'none'; farmSection.style.display = 'block';
-            loadFarmRoster();
-        };
-
-        // Auth Logic
-        document.getElementById('signup-btn').onclick = async () => {
-            const e = document.getElementById('email-input').value;
-            const p = document.getElementById('password-input').value;
-            try { await createUserWithEmailAndPassword(auth, e, p); } catch (err) { alert(err.message); }
-        };
-
-        document.getElementById('login-btn').onclick = async () => {
-            const e = document.getElementById('email-input').value;
-            const p = document.getElementById('password-input').value;
-            try { await signInWithEmailAndPassword(auth, e, p); } catch (err) { alert(err.message); }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUserUid = user.uid;
-                loginSection.style.display = 'none';
-                debugBar.innerHTML = "✅ Logged In: " + user.email;
-                debugBar.style.background = "#2ea44f";
-                checkPlayerEcosystem(user.uid);
-            } else {
-                loginSection.style.display = 'block';
-                navBar.style.display = 'none';
-                gameSection.style.display = 'none';
-            }
-        });
-
-        async function checkPlayerEcosystem(uid) {
-            const snap = await getDoc(doc(db, "players", uid));
-            if (snap.exists() && snap.data().active_pomomon_id) {
-                loadGameScreen(snap.data().active_pomomon_id);
-            } else {
-                eggSelection.style.display = 'block';
-            }
-        }
-
-        // Egg Selection
-        document.querySelectorAll('.egg-btn').forEach(btn => {
-            btn.onclick = async () => {
-                const element = btn.getAttribute('data-element');
-                const monsterRef = await addDoc(collection(db, "players", currentUserUid, "roster"), {
-                    species: `Egg_${element}`, current_xp: 0
-                });
-                await setDoc(doc(db, "players", currentUserUid), { active_pomomon_id: monsterRef.id }, { merge: true });
-                eggSelection.style.display = 'none';
-                loadGameScreen(monsterRef.id);
-            };
-        });
-
-        // Game Core
-        async function loadGameScreen(monsterId) {
-            activeMonsterId = monsterId;
-            navBar.style.display = 'flex';
-            gameSection.style.display = 'block';
-            
-            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", monsterId));
-            if (snap.exists()) {
-                const data = snap.data();
-                const seed = data.species;
-                spriteRenderer.innerHTML = `
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&backgroundColor=0d1117" class="pomo-sprite" id="active-sprite-img">
-                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px;">${seed.replace('_',' ')}</div>
-                `;
-            }
-            updateTimerDisplay();
-        }
-
-        async function loadFarmRoster() {
-            const grid = document.getElementById('farm-grid');
-            grid.innerHTML = "Loading...";
-            const snap = await getDocs(collection(db, "players", currentUserUid, "roster"));
-            grid.innerHTML = "";
-            snap.forEach(d => {
-                const isEquipped = d.id === activeMonsterId;
-                const card = document.createElement('div');
-                card.className = `pomo-card ${isEquipped ? 'equipped' : ''}`;
-                card.innerHTML = `
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${d.data().species}">
-                    <div style="font-size:0.7rem; margin:5px 0;">${d.data().species}</div>
-                    <button style="font-size:0.6rem; padding:4px; background:var(--neon-green); color:black; border-radius:4px;" ${isEquipped?'disabled':''}>
-                        ${isEquipped ? 'Active' : 'Equip'}
-                    </button>
-                `;
-                if(!isEquipped) card.querySelector('button').onclick = () => {
-                    updateDoc(doc(db, "players", currentUserUid), { active_pomomon_id: d.id });
-                    location.reload();
-                };
-                grid.appendChild(card);
-            });
-        }
-
-        // Timer Logic
-        startBtn.onclick = () => {
-            if (isRunning) return;
-            isRunning = true;
-            startBtn.innerText = "Focusing...";
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    alert("Focus Session Complete! +50 XP");
-                    updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { current_xp: increment(50) });
-                    resetSession();
-                }
-            }, 1000);
-        };
-
-        function resetSession() {
-            clearInterval(timerInterval);
-            isRunning = false;
-            timeLeft = document.getElementById('time-input').value * 60;
-            startBtn.innerText = "Start";
-            updateTimerDisplay();
-        }
-
-        function updateTimerDisplay() {
-            const m = Math.floor(timeLeft / 60);
-            const s = timeLeft % 60;
-            timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        // --- CORE UTILS ---
+        function setPomomonState(stateName) {
+            const spriteDiv = document.getElementById('active-sprite-img');
+            if (!spriteDiv) return;
+            spriteDiv.classList.remove('state-idle', 'state-walk', 'state-attack');
+            spriteDiv.classList.add(`state-${stateName}`);
+            if (stateName === 'attack') setTimeout(() => setPomomonState('idle'), 600);
         }
 
         function updateHPDisplay() {
             hpFill.style.width = currentHP + "%";
             hpText.innerText = `${currentHP} / 100`;
-            if(currentHP < 30) hpFill.style.backgroundColor = "var(--neon-red)";
+            hpFill.style.background = currentHP < 30 ? "var(--neon-red)" : "var(--neon-green)";
         }
 
-        // Penalty Logic
-        function triggerPenalty() {
-            if (!isRunning) return;
-            currentHP -= 15;
-            updateHPDisplay();
-            document.getElementById('penalty-modal').classList.add('active');
-            clearInterval(timerInterval);
-            const img = document.getElementById('active-sprite-img');
-            if(img) img.style.filter = "hue-rotate(90deg) brightness(2)";
+        function updateTimerUI() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
         }
+
+        // --- AUTH & ONBOARDING ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserUid = user.uid;
+                document.getElementById('login-section').style.display = 'none';
+                checkPlayerEcosystem();
+            }
+        });
+
+        async function checkPlayerEcosystem() {
+            const snap = await getDoc(doc(db, "players", currentUserUid));
+            if (snap.exists() && snap.data().active_pomomon_id) {
+                activeMonsterId = snap.data().active_pomomon_id;
+                showUI('arena');
+                initMonster();
+            } else {
+                showUI('egg');
+            }
+        }
+
+        function showUI(view) {
+            document.getElementById('egg-selection').style.display = view === 'egg' ? 'block' : 'none';
+            document.getElementById('game-section').style.display = view === 'arena' ? 'block' : 'none';
+            document.getElementById('nav-bar').style.display = (view === 'arena' || view === 'farm') ? 'flex' : 'none';
+            document.getElementById('farm-section').style.display = view === 'farm' ? 'block' : 'none';
+        }
+
+        // Egg Click Logic
+        document.querySelectorAll('.egg-btn').forEach(btn => {
+            btn.onclick = async () => {
+                const type = btn.getAttribute('data-type');
+                const monsterId = "starter_" + Date.now();
+                await setDoc(doc(db, "players", currentUserUid), { active_pomomon_id: monsterId });
+                await setDoc(doc(db, "players", currentUserUid, "roster", monsterId), {
+                    species: type + "_Bot", hp: 100, xp: 0
+                });
+                checkPlayerEcosystem();
+            };
+        });
+
+        async function initMonster() {
+            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId));
+            if(snap.exists()){
+                currentHP = snap.data().hp ?? 100;
+                document.getElementById('active-species-name').innerText = snap.data().species;
+                updateHPDisplay();
+                setPomomonState('idle');
+            }
+        }
+
+        // --- TIMER & GIVE UP ---
+        document.getElementById('start-btn').onclick = () => {
+            if (isRunning) return;
+            if (currentHP <= 0) return alert("Heal your Pomo-mon first!");
+            isRunning = true;
+            setPomomonState('walk');
+            document.getElementById('start-btn').innerText = "FOCUSING...";
+            timerInterval = setInterval(() => {
+                timeLeft--; updateTimerUI();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    setPomomonState('attack');
+                    setTimeout(() => {
+                        alert("Session Complete! +50 XP");
+                        updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { xp: increment(50) });
+                        resetSession();
+                    }, 600);
+                }
+            }, 1000);
+        };
+
+        // FIXED GIVE UP LOGIC
+        document.getElementById('give-up-btn').onclick = async () => {
+            if (!isRunning) return;
+            if (confirm("If you give up, your Pomo-mon will take 20 DMG. Proceed?")) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                currentHP = Math.max(0, currentHP - 20);
+                
+                // Sync to Firebase
+                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { hp: currentHP });
+                
+                // UI Cleanup
+                updateHPDisplay();
+                setPomomonState('idle');
+                resetSession();
+            }
+        };
+
+        function resetSession() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            timeLeft = document.getElementById('time-input').value * 60;
+            document.getElementById('start-btn').innerText = "Start Session";
+            updateTimerUI();
+        }
+
+        // --- GBA FARM LOGIC ---
+        async function loadFarm() {
+            const grid = document.getElementById('farm-grid');
+            grid.innerHTML = "";
+            const querySnap = await getDocs(collection(db, "players", currentUserUid, "roster"));
+            const monsters = [];
+            querySnap.forEach(doc => monsters.push({ id: doc.id, ...doc.data() }));
+
+            for (let i = 0; i < 30; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'gba-cell';
+                const m = monsters[i];
+                if (m) {
+                    cell.innerHTML = `<div class="farm-sprite-icon"></div>`;
+                    cell.onclick = () => selectMonster(m, cell);
+                }
+                grid.appendChild(cell);
+            }
+        }
+
+        function selectMonster(monster, element) {
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedFarmId = monster.id;
+            
+            document.getElementById('summary-panel').style.display = 'block';
+            document.getElementById('sum-species').innerText = monster.species;
+            document.getElementById('sum-hp').innerText = monster.hp;
+            document.getElementById('sum-xp').innerText = monster.xp;
+        }
+
+        document.getElementById('equip-btn').onclick = async () => {
+            if (!selectedFarmId) return;
+            await updateDoc(doc(db, "players", currentUserUid), { active_pomomon_id: selectedFarmId });
+            activeMonsterId = selectedFarmId;
+            initMonster();
+            showUI('arena');
+            document.getElementById('nav-arena').classList.add('active');
+            document.getElementById('nav-farm').classList.remove('active');
+        };
+
+        document.getElementById('cancel-btn').onclick = () => {
+            document.getElementById('summary-panel').style.display = 'none';
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+        };
+
+        // Navigation
+        document.getElementById('nav-arena').onclick = () => showUI('arena');
+        document.getElementById('nav-farm').onclick = () => {
+            if(isRunning) return alert("Finish your focus session!");
+            showUI('farm');
+            loadFarm();
+        };
+
+        // --- PENALTY LOGIC ---
+        window.onblur = async () => {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                currentHP = Math.max(0, currentHP - 15);
+                updateHPDisplay();
+                setPomomonState('idle');
+                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { hp: currentHP });
+                document.getElementById('penalty-modal').classList.add('active');
+            }
+        };
 
         document.getElementById('resume-btn').onclick = () => {
             document.getElementById('penalty-modal').classList.remove('active');
-            const img = document.getElementById('active-sprite-img');
-            if(img) img.style.filter = "none";
-            startBtn.click();
+            document.getElementById('start-btn').click();
         };
 
-        window.onblur = triggerPenalty;
-        document.addEventListener('visibilitychange', () => { if(document.hidden) triggerPenalty(); });
+        // Auth Buttons
+        document.getElementById('login-btn').onclick = () => {
+            const e = document.getElementById('email-input').value;
+            const p = document.getElementById('password-input').value;
+            signInWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
+        };
+
+        document.getElementById('signup-btn').onclick = () => {
+            const e = document.getElementById('email-input').value;
+            const p = document.getElementById('password-input').value;
+            createUserWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
+        };
 
     </script>
 </body>
