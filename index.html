@@ -16,6 +16,13 @@
             /* SPRITE MATH */
             --frame-width: 118px; 
             --frame-height: 120px;
+
+            /* GBA PALETTE (Farm Only) */
+            --gba-mint: #98d8b8;
+            --gba-blue: #70a8a8;
+            --gba-dark-teal: #385858;
+            --gba-border: #405040;
+            --gba-selected: #f8d030;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,33 +61,30 @@
         }
 
         /* --- UI COMPONENTS --- */
-        .hp-wrapper { margin-bottom: 1.5rem; text-align: left; }
+        .hp-wrapper { margin-bottom: 1rem; text-align: left; }
         .hp-labels { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        .hp-bar-container { width: 100%; height: 20px; background-color: #21262d; border: 2px solid #30363d; border-radius: 10px; overflow: hidden; }
+        .hp-bar-container { width: 100%; height: 16px; background-color: #21262d; border: 2px solid #30363d; border-radius: 8px; overflow: hidden; }
         #hp-fill { height: 100%; width: 100%; background-color: var(--neon-green); transition: width 0.4s ease; }
 
         .auth-input { width: 100%; padding: 0.8rem; margin-bottom: 10px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 6px; }
-        .nav-bar { display: none; gap: 10px; margin-bottom: 1.5rem; justify-content: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .nav-bar { display: none; gap: 10px; margin-bottom: 1rem; justify-content: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .nav-btn { background: none; color: var(--text-muted); border: none; cursor: pointer; font-weight: bold; padding: 5px 10px; }
         .nav-btn.active { color: var(--neon-green); border-bottom: 2px solid var(--neon-green); }
 
-        .timer-display { font-size: 3.5rem; font-weight: bold; font-family: monospace; margin: 1rem 0; }
+        .timer-display { font-size: 3.5rem; font-weight: bold; font-family: monospace; margin: 0.5rem 0; }
         button { padding: 0.8rem 1.2rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; text-transform: uppercase; }
+        
         #start-btn { background: var(--neon-green); color: black; width: 60%; }
         #give-up-btn { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); width: 35%; }
 
-        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:9999; }
-        .modal-overlay.active { display: flex; }
-
         /* --- RETRO GBA FARM SECTION --- */
         #farm-section {
-            background-color: #e0f8cf; /* Classic GB light Green */
-            border: 4px solid #306230; 
-            padding: 15px;
+            background-color: var(--gba-mint);
+            border: 4px double var(--gba-border);
+            padding: 10px;
+            color: var(--gba-dark-teal);
+            font-family: 'Courier New', Courier, monospace;
             border-radius: 4px;
-            display: none;
-            color: #081820;
-            image-rendering: pixelated;
         }
 
         .gba-grid {
@@ -88,16 +92,15 @@
             grid-template-columns: repeat(5, 1fr);
             grid-template-rows: repeat(6, 1fr);
             gap: 4px;
-            background-color: #9bbc0f;
-            padding: 4px;
-            border: 2px solid #306230;
-            margin-bottom: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px;
+            border: 2px inset var(--gba-blue);
         }
 
         .gba-cell {
-            aspect-ratio: 1;
-            background-color: #e0f8cf;
-            border: 1px solid #8bac0f;
+            aspect-ratio: 1/1;
+            background: var(--gba-blue);
+            border: 1px solid var(--gba-dark-teal);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -105,44 +108,39 @@
             position: relative;
         }
 
-        .gba-cell.selected {
-            outline: 3px solid #f83800; /* Retro red cursor */
-            z-index: 2;
-        }
-
-        .farm-sprite-icon {
-            width: 40px;
-            height: 40px;
+        .gba-cell.selected { border: 3px solid var(--gba-selected); box-shadow: inset 0 0 5px orange; }
+        
+        .gba-mini-sprite {
+            width: 40px; height: 40px;
             background-image: url('idle_strip.png');
             background-size: 160px 40px; /* 4 frames scaled down */
             background-repeat: no-repeat;
             image-rendering: pixelated;
         }
 
-        .summary-menu {
-            background: #ffffff;
-            border: 3px double #306230;
+        .gba-summary-panel {
+            margin-top: 10px;
+            background: var(--gba-blue);
+            border: 2px solid var(--gba-dark-teal);
             padding: 10px;
             text-align: left;
-            font-family: 'Courier New', Courier, monospace;
             font-size: 0.8rem;
         }
 
-        .summary-btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        .gba-btn-group { display: flex; gap: 5px; margin-top: 8px; }
+        .gba-btn { 
+            flex: 1; padding: 5px; border: 2px solid var(--gba-dark-teal); 
+            background: #eee; font-size: 0.7rem; font-weight: bold; cursor: pointer;
         }
+        .gba-btn:active { background: #ccc; }
 
-        .gba-btn {
-            background: #8bac0f;
-            border: 2px solid #306230;
-            color: #081820;
-            padding: 5px 10px;
-            font-size: 0.7rem;
-            flex: 1;
-        }
+        /* Egg Selection */
+        .egg-container { display: flex; justify-content: space-around; margin: 20px 0; }
+        .egg-btn { background: #21262d; border: 1px solid var(--neon-green); color: var(--neon-green); padding: 10px; cursor: pointer; border-radius: 8px; flex:1; margin:0 5px; }
 
+        /* Modal */
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:9999; }
+        .modal-overlay.active { display: flex; }
         #mobile-debug { background: #39ff14; color: black; padding: 5px; font-size: 10px; position: fixed; top: 0; width: 100%; z-index: 10000; text-align: center; }
     </style>
 </head>
@@ -152,10 +150,10 @@
 
     <div class="container">
         <h1>TabTamer</h1>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1.5rem;">Protect your Pomo-mon</p>
 
         <!-- Auth Section -->
         <div id="login-section">
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1.5rem;">Join the Pomo-mon Trainers</p>
             <input type="email" id="email-input" class="auth-input" placeholder="Email">
             <input type="password" id="password-input" class="auth-input" placeholder="Password">
             <div style="display:flex; gap:10px;">
@@ -166,33 +164,30 @@
 
         <!-- Egg Selection (Restored) -->
         <div id="egg-selection" style="display: none;">
-            <p style="margin-bottom: 1rem;">Pick Your Starter Egg</p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="egg-btn" data-type="Fire" style="background:#ff4500; color:white;">FIRE</button>
-                <button class="egg-btn" data-type="Water" style="background:#1e90ff; color:white;">WATER</button>
-                <button class="egg-btn" data-type="Grass" style="background:#32cd32; color:white;">GRASS</button>
+            <h3>Pick your starter egg!</h3>
+            <div class="egg-container">
+                <button class="egg-btn" onclick="claimStarter('Fire')">ðŸ”¥<br>FIRE</button>
+                <button class="egg-btn" onclick="claimStarter('Water')">ðŸ’§<br>WATER</button>
+                <button class="egg-btn" onclick="claimStarter('Grass')">ðŸŒ¿<br>GRASS</button>
             </div>
         </div>
 
-        <!-- App Nav -->
+        <!-- Navigation -->
         <div id="nav-bar" class="nav-bar">
             <button id="nav-arena" class="nav-btn active">ARENA</button>
             <button id="nav-farm" class="nav-btn">FARM</button>
         </div>
 
-        <!-- Arena Section -->
+        <!-- Arena (Game Screen) -->
         <div id="game-section" style="display: none;">
             <div class="hp-wrapper">
                 <div class="hp-labels"><span>HP</span><span id="hp-text">100 / 100</span></div>
                 <div class="hp-bar-container"><div id="hp-fill"></div></div>
             </div>
 
-            <div id="sprite-renderer" style="min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div id="active-sprite-img" class="sprite-viewport state-idle"></div>
-                <div id="active-species-name" style="font-weight:bold; color:var(--neon-green); margin-top:10px;">---</div>
-            </div>
+            <div id="sprite-renderer" style="min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;"></div>
 
-            <div style="margin-top: 10px; font-size: 0.8rem;">
+            <div style="margin-top: 5px; font-size: 0.8rem;">
                 Focus (Mins): <input type="number" id="time-input" value="25" min="1" style="background:#0d1117; color:var(--neon-green); border:1px solid #333; width:50px;">
             </div>
 
@@ -204,26 +199,18 @@
             </div>
         </div>
         
-        <!-- Retro Farm Section (Upgraded) -->
-        <div id="farm-section">
-            <div style="margin-bottom: 10px; font-weight: bold; display: flex; justify-content: space-between;">
-                <span>BOX 1</span>
-                <span>30/30</span>
+        <!-- Farm Section (GBA Retro Upgrade) -->
+        <div id="farm-section" style="display:none;">
+            <h4 style="margin-bottom:8px;">POMO-MON STORAGE</h4>
+            <div id="gba-grid" class="gba-grid">
+                <!-- 30 Cells generated via JS -->
             </div>
             
-            <div class="gba-grid" id="farm-grid">
-                <!-- 30 cells generated by JS -->
-            </div>
-
-            <div id="summary-panel" class="summary-menu" style="display: none;">
-                <div id="summary-data">
-                    <strong>SPECIES:</strong> <span id="sum-species">-</span><br>
-                    <strong>HP:</strong> <span id="sum-hp">-</span><br>
-                    <strong>XP:</strong> <span id="sum-xp">-</span>
-                </div>
-                <div class="summary-btn-group">
-                    <button class="gba-btn" id="equip-btn">EQUIP</button>
-                    <button class="gba-btn" id="cancel-btn">CANCEL</button>
+            <div id="gba-summary" class="gba-summary-panel">
+                <div id="summary-content">Select a Pomo-mon...</div>
+                <div class="gba-btn-group">
+                    <button class="gba-btn" id="gba-equip-btn" style="display:none;">EQUIP</button>
+                    <button class="gba-btn" id="gba-cancel-btn">CANCEL</button>
                 </div>
             </div>
         </div>
@@ -241,7 +228,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, increment, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyABCxcL0uRz_ypOjjCb_lsft0AWOTO--Ls",
@@ -262,20 +249,164 @@
         let timeLeft = 25 * 60;
         let isRunning = false;
         let timerInterval;
-        let selectedFarmId = null;
+        let rosterData = [];
+        let selectedMonsterId = null;
 
-        const spriteImg = document.getElementById('active-sprite-img');
+        // UI Selectors
+        const spriteRenderer = document.getElementById('sprite-renderer');
         const timerDisplay = document.getElementById('timer');
         const hpFill = document.getElementById('hp-fill');
         const hpText = document.getElementById('hp-text');
 
-        // --- CORE UTILS ---
+        // --- AUTH & ECOSYSTEM ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserUid = user.uid;
+                document.getElementById('login-section').style.display = 'none';
+                checkPlayerEcosystem(user.uid);
+            }
+        });
+
+        async function checkPlayerEcosystem(uid) {
+            const snap = await getDoc(doc(db, "players", uid));
+            if (snap.exists() && snap.data().active_pomomon_id) {
+                activeMonsterId = snap.data().active_pomomon_id;
+                showArena();
+            } else {
+                document.getElementById('egg-selection').style.display = 'block';
+                document.getElementById('nav-bar').style.display = 'none';
+                document.getElementById('game-section').style.display = 'none';
+            }
+        }
+
+        window.claimStarter = async (element) => {
+            const speciesMap = { Fire: "Ember_Bot", Water: "Aqua_Bot", Grass: "Leaf_Bot" };
+            const newMonster = { species: speciesMap[element], hp: 100, xp: 0 };
+            
+            const docRef = await addDoc(collection(db, "players", currentUserUid, "roster"), newMonster);
+            await setDoc(doc(db, "players", currentUserUid), { active_pomomon_id: docRef.id });
+            
+            activeMonsterId = docRef.id;
+            document.getElementById('egg-selection').style.display = 'none';
+            showArena();
+        };
+
+        function showArena() {
+            document.getElementById('nav-bar').style.display = 'flex';
+            document.getElementById('game-section').style.display = 'block';
+            document.getElementById('farm-section').style.display = 'none';
+            initMonster();
+        }
+
+        async function initMonster() {
+            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId));
+            if(snap.exists()){
+                currentHP = snap.data().hp;
+                updateHPDisplay();
+                spriteRenderer.innerHTML = `
+                    <div id="active-sprite-img" class="sprite-viewport state-idle"></div>
+                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px;">${snap.data().species}</div>
+                `;
+            }
+        }
+
+        // --- TIMER & GIVE UP LOGIC ---
+        document.getElementById('start-btn').onclick = () => {
+            if (isRunning) return;
+            if (currentHP <= 0) return alert("Your Pomo-mon is fainted! Heal it in the Farm.");
+            isRunning = true;
+            setPomomonState('walk');
+            document.getElementById('start-btn').innerText = "FOCUSING...";
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                if (timeLeft <= 0) completeSession();
+            }, 1000);
+        };
+
+        // FIXED GIVE UP LOGIC
+        document.getElementById('give-up-btn').onclick = async () => {
+            if (!isRunning) return;
+            if (confirm("If you give up, your Pomo-mon will take 20 damage. Continue?")) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                currentHP = Math.max(0, currentHP - 20);
+                updateHPDisplay();
+                setPomomonState('idle');
+                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { hp: currentHP });
+                resetSession();
+                alert("Session abandoned. Pomo-mon took 20 damage.");
+            }
+        };
+
+        function completeSession() {
+            clearInterval(timerInterval);
+            setPomomonState('attack');
+            setTimeout(async () => {
+                alert("Session Complete! +50 XP");
+                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { xp: increment(50) });
+                resetSession();
+            }, 600);
+        }
+
+        function resetSession() {
+            isRunning = false;
+            timeLeft = document.getElementById('time-input').value * 60;
+            document.getElementById('start-btn').innerText = "Start Session";
+            updateTimerUI();
+        }
+
+        // --- GBA FARM LOGIC ---
+        async function loadFarm() {
+            const grid = document.getElementById('gba-grid');
+            grid.innerHTML = '';
+            const snap = await getDocs(collection(db, "players", currentUserUid, "roster"));
+            rosterData = [];
+            snap.forEach(d => rosterData.push({ id: d.id, ...d.data() }));
+
+            // Generate 30 cells (5x6)
+            for (let i = 0; i < 30; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'gba-cell';
+                if (rosterData[i]) {
+                    cell.innerHTML = `<div class="gba-mini-sprite"></div>`;
+                    cell.onclick = () => selectMonster(rosterData[i], cell);
+                }
+                grid.appendChild(cell);
+            }
+        }
+
+        function selectMonster(pomo, cellElement) {
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+            cellElement.classList.add('selected');
+            selectedMonsterId = pomo.id;
+
+            document.getElementById('summary-content').innerHTML = `
+                <strong>${pomo.species}</strong><br>
+                HP: ${pomo.hp}/100 | XP: ${pomo.xp}
+            `;
+            document.getElementById('gba-equip-btn').style.display = 'block';
+        }
+
+        document.getElementById('gba-equip-btn').onclick = async () => {
+            if (!selectedMonsterId) return;
+            await updateDoc(doc(db, "players", currentUserUid), { active_pomomon_id: selectedMonsterId });
+            activeMonsterId = selectedMonsterId;
+            document.getElementById('nav-arena').click();
+        };
+
+        document.getElementById('gba-cancel-btn').onclick = () => {
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+            document.getElementById('summary-content').innerText = 'Select a Pomo-mon...';
+            document.getElementById('gba-equip-btn').style.display = 'none';
+        };
+
+        // --- HELPERS ---
         function setPomomonState(stateName) {
             const spriteDiv = document.getElementById('active-sprite-img');
             if (!spriteDiv) return;
             spriteDiv.classList.remove('state-idle', 'state-walk', 'state-attack');
             spriteDiv.classList.add(`state-${stateName}`);
-            if (stateName === 'attack') setTimeout(() => setPomomonState('idle'), 600);
         }
 
         function updateHPDisplay() {
@@ -290,158 +421,7 @@
             timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
         }
 
-        // --- AUTH & ONBOARDING ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUserUid = user.uid;
-                document.getElementById('login-section').style.display = 'none';
-                checkPlayerEcosystem();
-            }
-        });
-
-        async function checkPlayerEcosystem() {
-            const snap = await getDoc(doc(db, "players", currentUserUid));
-            if (snap.exists() && snap.data().active_pomomon_id) {
-                activeMonsterId = snap.data().active_pomomon_id;
-                showUI('arena');
-                initMonster();
-            } else {
-                showUI('egg');
-            }
-        }
-
-        function showUI(view) {
-            document.getElementById('egg-selection').style.display = view === 'egg' ? 'block' : 'none';
-            document.getElementById('game-section').style.display = view === 'arena' ? 'block' : 'none';
-            document.getElementById('nav-bar').style.display = (view === 'arena' || view === 'farm') ? 'flex' : 'none';
-            document.getElementById('farm-section').style.display = view === 'farm' ? 'block' : 'none';
-        }
-
-        // Egg Click Logic
-        document.querySelectorAll('.egg-btn').forEach(btn => {
-            btn.onclick = async () => {
-                const type = btn.getAttribute('data-type');
-                const monsterId = "starter_" + Date.now();
-                await setDoc(doc(db, "players", currentUserUid), { active_pomomon_id: monsterId });
-                await setDoc(doc(db, "players", currentUserUid, "roster", monsterId), {
-                    species: type + "_Bot", hp: 100, xp: 0
-                });
-                checkPlayerEcosystem();
-            };
-        });
-
-        async function initMonster() {
-            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId));
-            if(snap.exists()){
-                currentHP = snap.data().hp ?? 100;
-                document.getElementById('active-species-name').innerText = snap.data().species;
-                updateHPDisplay();
-                setPomomonState('idle');
-            }
-        }
-
-        // --- TIMER & GIVE UP ---
-        document.getElementById('start-btn').onclick = () => {
-            if (isRunning) return;
-            if (currentHP <= 0) return alert("Heal your Pomo-mon first!");
-            isRunning = true;
-            setPomomonState('walk');
-            document.getElementById('start-btn').innerText = "FOCUSING...";
-            timerInterval = setInterval(() => {
-                timeLeft--; updateTimerUI();
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    setPomomonState('attack');
-                    setTimeout(() => {
-                        alert("Session Complete! +50 XP");
-                        updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { xp: increment(50) });
-                        resetSession();
-                    }, 600);
-                }
-            }, 1000);
-        };
-
-        // FIXED GIVE UP LOGIC
-        document.getElementById('give-up-btn').onclick = async () => {
-            if (!isRunning) return;
-            if (confirm("If you give up, your Pomo-mon will take 20 DMG. Proceed?")) {
-                clearInterval(timerInterval);
-                isRunning = false;
-                currentHP = Math.max(0, currentHP - 20);
-                
-                // Sync to Firebase
-                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterId), { hp: currentHP });
-                
-                // UI Cleanup
-                updateHPDisplay();
-                setPomomonState('idle');
-                resetSession();
-            }
-        };
-
-        function resetSession() {
-            isRunning = false;
-            clearInterval(timerInterval);
-            timeLeft = document.getElementById('time-input').value * 60;
-            document.getElementById('start-btn').innerText = "Start Session";
-            updateTimerUI();
-        }
-
-        // --- GBA FARM LOGIC ---
-        async function loadFarm() {
-            const grid = document.getElementById('farm-grid');
-            grid.innerHTML = "";
-            const querySnap = await getDocs(collection(db, "players", currentUserUid, "roster"));
-            const monsters = [];
-            querySnap.forEach(doc => monsters.push({ id: doc.id, ...doc.data() }));
-
-            for (let i = 0; i < 30; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'gba-cell';
-                const m = monsters[i];
-                if (m) {
-                    cell.innerHTML = `<div class="farm-sprite-icon"></div>`;
-                    cell.onclick = () => selectMonster(m, cell);
-                }
-                grid.appendChild(cell);
-            }
-        }
-
-        function selectMonster(monster, element) {
-            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedFarmId = monster.id;
-            
-            document.getElementById('summary-panel').style.display = 'block';
-            document.getElementById('sum-species').innerText = monster.species;
-            document.getElementById('sum-hp').innerText = monster.hp;
-            document.getElementById('sum-xp').innerText = monster.xp;
-        }
-
-        document.getElementById('equip-btn').onclick = async () => {
-            if (!selectedFarmId) return;
-            await updateDoc(doc(db, "players", currentUserUid), { active_pomomon_id: selectedFarmId });
-            activeMonsterId = selectedFarmId;
-            initMonster();
-            showUI('arena');
-            document.getElementById('nav-arena').classList.add('active');
-            document.getElementById('nav-farm').classList.remove('active');
-        };
-
-        document.getElementById('cancel-btn').onclick = () => {
-            document.getElementById('summary-panel').style.display = 'none';
-            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
-        };
-
-        // Navigation
-        document.getElementById('nav-arena').onclick = () => showUI('arena');
-        document.getElementById('nav-farm').onclick = () => {
-            if(isRunning) return alert("Finish your focus session!");
-            showUI('farm');
-            loadFarm();
-        };
-
-        // --- PENALTY LOGIC ---
+        // Visibility Penalty
         window.onblur = async () => {
             if (isRunning) {
                 clearInterval(timerInterval);
@@ -455,7 +435,24 @@
 
         document.getElementById('resume-btn').onclick = () => {
             document.getElementById('penalty-modal').classList.remove('active');
+            isRunning = false;
             document.getElementById('start-btn').click();
+        };
+
+        // Navigation
+        document.getElementById('nav-arena').onclick = () => {
+            showArena();
+            document.getElementById('nav-arena').classList.add('active');
+            document.getElementById('nav-farm').classList.remove('active');
+        };
+
+        document.getElementById('nav-farm').onclick = () => {
+            if(isRunning) return alert("Finish your focus session first!");
+            document.getElementById('game-section').style.display = 'none';
+            document.getElementById('farm-section').style.display = 'block';
+            document.getElementById('nav-farm').classList.add('active');
+            document.getElementById('nav-arena').classList.remove('active');
+            loadFarm();
         };
 
         // Auth Buttons
@@ -470,7 +467,6 @@
             const p = document.getElementById('password-input').value;
             createUserWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
         };
-
     </script>
 </body>
 </html>
