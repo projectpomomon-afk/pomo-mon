@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TabTamer | Project Pomo-mon MVP (Sprint 5.1)</title>
+    <title>TabTamer | Project Pomo-mon MVP (Sprint 5.2)</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -131,7 +131,7 @@
 </head>
 <body>
 
-    <div id="mobile-debug">System Status: V5.1 Bugfixes Deployed</div>
+    <div id="mobile-debug">System Status: V5.2 Logic Patches Active</div>
 
     <div class="container">
         <h1>TabTamer</h1>
@@ -169,7 +169,7 @@
             <div id="sprite-renderer" style="min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;"></div>
 
             <div style="margin-top: 5px; font-size: 0.8rem;">
-                Focus (Mins): <input type="number" id="time-input" value="25" min="1" style="background:#0d1117; color:var(--neon-green); border:1px solid #333; width:50px;">
+                Focus (Mins): <input type="number" id="time-input" min="1" style="background:#0d1117; color:var(--neon-green); border:1px solid #333; width:50px;">
             </div>
 
             <div class="timer-display" id="timer">25:00</div>
@@ -223,71 +223,54 @@
 
         // --- THE POMODEX (17 Families, 3 Stages) ---
         const POMODEX = [
-            // 1. Fire
             { id: 1, name: "Emberling", nextEvolutionId: 2, evolutionXpThreshold: 500 },
             { id: 2, name: "Flarehound", nextEvolutionId: 3, evolutionXpThreshold: 2000 },
             { id: 3, name: "Infernox", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 2. Water
             { id: 4, name: "Splashy", nextEvolutionId: 5, evolutionXpThreshold: 500 },
             { id: 5, name: "Riverun", nextEvolutionId: 6, evolutionXpThreshold: 2000 },
             { id: 6, name: "Tsunamiath", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 3. Grass
             { id: 7, name: "Seedling", nextEvolutionId: 8, evolutionXpThreshold: 500 },
             { id: 8, name: "Vineguard", nextEvolutionId: 9, evolutionXpThreshold: 2000 },
             { id: 9, name: "Forestking", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 4. Electric
             { id: 10, name: "Sparky", nextEvolutionId: 11, evolutionXpThreshold: 500 },
             { id: 11, name: "Voltstrike", nextEvolutionId: 12, evolutionXpThreshold: 2000 },
             { id: 12, name: "Thunderlord", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 5. Stone
             { id: 13, name: "Pebble", nextEvolutionId: 14, evolutionXpThreshold: 500 },
             { id: 14, name: "Boulderback", nextEvolutionId: 15, evolutionXpThreshold: 2000 },
             { id: 15, name: "Mountainous", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 6. Cyber
             { id: 16, name: "Bit", nextEvolutionId: 17, evolutionXpThreshold: 500 },
             { id: 17, name: "Byte", nextEvolutionId: 18, evolutionXpThreshold: 2000 },
             { id: 18, name: "Megahertz", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 7. Cosmic
             { id: 19, name: "Starlet", nextEvolutionId: 20, evolutionXpThreshold: 500 },
             { id: 20, name: "Orbitron", nextEvolutionId: 21, evolutionXpThreshold: 2000 },
             { id: 21, name: "Galaxia", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 8. Ghost
             { id: 22, name: "Spook", nextEvolutionId: 23, evolutionXpThreshold: 500 },
             { id: 23, name: "Phantom", nextEvolutionId: 24, evolutionXpThreshold: 2000 },
             { id: 24, name: "Poltergeist", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 9. Ice
             { id: 25, name: "Frostbite", nextEvolutionId: 26, evolutionXpThreshold: 500 },
             { id: 26, name: "Glacier", nextEvolutionId: 27, evolutionXpThreshold: 2000 },
             { id: 27, name: "Avalanche", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 10. Dragon
             { id: 28, name: "Wyrmling", nextEvolutionId: 29, evolutionXpThreshold: 500 },
             { id: 29, name: "Drake", nextEvolutionId: 30, evolutionXpThreshold: 2000 },
             { id: 30, name: "Dragonite", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 11. Steel
             { id: 31, name: "Scrap", nextEvolutionId: 32, evolutionXpThreshold: 500 },
             { id: 32, name: "Metalclad", nextEvolutionId: 33, evolutionXpThreshold: 2000 },
             { id: 33, name: "Titanium", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 12. Poison
             { id: 34, name: "Smog", nextEvolutionId: 35, evolutionXpThreshold: 500 },
             { id: 35, name: "Toxic", nextEvolutionId: 36, evolutionXpThreshold: 2000 },
             { id: 36, name: "Hazmat", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 13. Flying
             { id: 37, name: "Breeze", nextEvolutionId: 38, evolutionXpThreshold: 500 },
             { id: 38, name: "Gale", nextEvolutionId: 39, evolutionXpThreshold: 2000 },
             { id: 39, name: "Hurricane", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 14. Bug
             { id: 40, name: "Grub", nextEvolutionId: 41, evolutionXpThreshold: 500 },
             { id: 41, name: "Chrysalis", nextEvolutionId: 42, evolutionXpThreshold: 2000 },
             { id: 42, name: "Swarm", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 15. Fighting
             { id: 43, name: "Scrapper", nextEvolutionId: 44, evolutionXpThreshold: 500 },
             { id: 44, name: "Brawler", nextEvolutionId: 45, evolutionXpThreshold: 2000 },
             { id: 45, name: "Champion", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 16. Psychic
             { id: 46, name: "Mind", nextEvolutionId: 47, evolutionXpThreshold: 500 },
             { id: 47, name: "Brain", nextEvolutionId: 48, evolutionXpThreshold: 2000 },
             { id: 48, name: "Cortex", nextEvolutionId: null, evolutionXpThreshold: null },
-            // 17. Fairy
             { id: 49, name: "Pixie", nextEvolutionId: 50, evolutionXpThreshold: 500 },
             { id: 50, name: "Sprite", nextEvolutionId: 51, evolutionXpThreshold: 2000 },
             { id: 51, name: "Archfey", nextEvolutionId: null, evolutionXpThreshold: null }
@@ -302,10 +285,16 @@
         let currentPomoId = null; 
         let currentHP = 100;
         let timeLeft = 25 * 60;
+        let activeFocusMins = 25; // Store active mins to calculate XP
         let isRunning = false;
         let timerInterval;
         let rosterData = [];
         let selectedMonsterDocId = null;
+
+        // Load saved timer preference or default to 25
+        const savedTimer = localStorage.getItem('pomoTimerPref') || 25;
+        document.getElementById('time-input').value = savedTimer;
+        timeLeft = savedTimer * 60;
 
         // UI Selectors
         const spriteRenderer = document.getElementById('sprite-renderer');
@@ -356,18 +345,26 @@
             if(snap.exists()){
                 const data = snap.data();
                 
-                // BUGFIX: Handle legacy firebase data that didn't have a numeric pomodexId
-                currentHP = data.hp !== undefined ? data.hp : 100;
-                currentPomoId = data.pomodexId || 1; 
+                // BUGFIX: Clean up NaN HP Database errors
+                currentHP = Number(data.hp);
+                if (isNaN(currentHP)) currentHP = 100;
+
+                // BUGFIX: Calculate real Level and XP
+                let currentXp = Number(data.xp);
+                if (isNaN(currentXp)) currentXp = 0;
+                let currentLevel = Math.floor(currentXp / 100) + 1;
                 
+                currentPomoId = data.pomodexId || 1; 
                 const pomoMeta = getPomoData(currentPomoId) || getPomoData(1);
 
                 updateHPDisplay();
                 spriteRenderer.innerHTML = `
                     <div id="active-sprite-img" class="sprite-viewport"></div>
-                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px;">${pomoMeta.name} (Lv. ${data.xp || 0} XP)</div>
+                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px;">
+                        ${pomoMeta.name} (Lv. ${currentLevel} | ${currentXp} XP)
+                    </div>
                 `;
-                setPomomonState('idle'); // Initialize the dynamic sprite
+                setPomomonState('idle'); 
             }
         }
 
@@ -376,12 +373,9 @@
             const spriteDiv = document.getElementById('active-sprite-img');
             if (!spriteDiv || !currentPomoId) return;
 
-            // BUGFIX: Strictly enforce lowercase to respect GitHub Pages (Linux) file system
-            // BUGFIX: Directly use the stateName without mapping to 'action1'
             const fileName = `pomomon${currentPomoId}_${stateName}_strip.png`.toLowerCase();
             spriteDiv.style.backgroundImage = `url('${fileName}')`;
 
-            // Adjust animation rules dynamically
             if (stateName === 'attack') {
                 spriteDiv.style.animation = 'play-sprite 0.6s steps(4) 1 forwards';
             } else {
@@ -389,12 +383,13 @@
             }
         }
 
-        // Update UI when timer input changes manually
+        // Timer Input Listener
         document.getElementById('time-input').addEventListener('input', (e) => {
             if (!isRunning) {
                 let mins = parseInt(e.target.value);
                 if (isNaN(mins) || mins < 1) mins = 25;
                 timeLeft = mins * 60;
+                localStorage.setItem('pomoTimerPref', mins); // Remember preference on refresh
                 updateTimerUI();
             }
         });
@@ -404,10 +399,10 @@
             if (isRunning) return;
             if (currentHP <= 0) return alert("Your Pomo-mon is fainted! Heal it in the Farm.");
             
-            // BUGFIX: Grab the current value from the custom timer input box just before starting
             let focusMins = parseInt(document.getElementById('time-input').value);
             if (isNaN(focusMins) || focusMins < 1) focusMins = 25;
             timeLeft = focusMins * 60;
+            activeFocusMins = focusMins; // Lock in the minutes for XP calc
 
             isRunning = true;
             setPomomonState('walk');
@@ -435,12 +430,19 @@
 
         function completeSession() {
             clearInterval(timerInterval);
-            setPomomonState('attack'); // Now correctly matches your "attack" filenames
+            
+            // BUGFIX: Immediately toggle isRunning so the incoming alert doesn't trigger a window blur penalty
+            isRunning = false; 
+            
+            setPomomonState('attack'); 
+            
+            // BUGFIX: Dynamic XP Scaling (1 min = 10 XP)
+            const xpGained = activeFocusMins * 10;
             
             setTimeout(async () => {
-                alert("Session Complete! +50 XP");
+                alert(`Session Complete! +${xpGained} XP`);
                 
-                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { xp: increment(50) });
+                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { xp: increment(xpGained) });
                 await checkEvolution(activeMonsterDocId);
                 
                 resetSession();
@@ -454,8 +456,10 @@
             
             const data = snap.data();
             const pomoMeta = getPomoData(data.pomodexId);
+            
+            let currentXp = Number(data.xp) || 0;
 
-            if (pomoMeta.nextEvolutionId && data.xp >= pomoMeta.evolutionXpThreshold) {
+            if (pomoMeta.nextEvolutionId && currentXp >= pomoMeta.evolutionXpThreshold) {
                 const evolvedPomo = getPomoData(pomoMeta.nextEvolutionId);
                 
                 alert(`WHAT? ${pomoMeta.name} is evolving!\n\n✨ YOUR POMO-MON EVOLVED INTO ${evolvedPomo.name.toUpperCase()}! ✨`);
@@ -463,9 +467,9 @@
                 await updateDoc(doc(db, "players", currentUserUid, "roster", docId), {
                     pomodexId: evolvedPomo.id
                 });
-                
-                await initMonster();
             }
+            // Always refresh UI to update new Level/XP/Sprite
+            await initMonster(); 
         }
 
         function resetSession() {
@@ -491,7 +495,6 @@
                 const cell = document.createElement('div');
                 cell.className = 'gba-cell';
                 if (rosterData[i]) {
-                    // BUGFIX: Added fallback so legacy Firebase records don't crash the grid
                     let safeId = rosterData[i].pomodexId || 1; 
                     const pData = getPomoData(safeId) || getPomoData(1);
                     
@@ -507,13 +510,18 @@
             cellElement.classList.add('selected');
             selectedMonsterDocId = rosterEntry.docId;
 
-            // BUGFIX: Displaying fallback HP if missing
-            let displayHp = rosterEntry.hp !== undefined ? rosterEntry.hp : 100;
-            let displayXp = rosterEntry.xp !== undefined ? rosterEntry.xp : 0;
+            // BUGFIX: Safe display math for farm 
+            let displayHp = Number(rosterEntry.hp);
+            if(isNaN(displayHp)) displayHp = 100;
+            
+            let displayXp = Number(rosterEntry.xp);
+            if(isNaN(displayXp)) displayXp = 0;
+            let displayLevel = Math.floor(displayXp / 100) + 1;
 
             document.getElementById('summary-content').innerHTML = `
                 <strong>${pomoMeta.name}</strong><br>
-                HP: ${displayHp}/100 | XP: ${displayXp}
+                HP: ${displayHp}/100<br>
+                Lv. ${displayLevel} | ${displayXp} XP
             `;
             document.getElementById('gba-equip-btn').style.display = 'block';
         }
@@ -546,7 +554,7 @@
 
         // Visibility Penalty
         window.onblur = async () => {
-            if (isRunning) {
+            if (isRunning && timeLeft > 0) { // Added double check so it doesn't fire at end of session
                 clearInterval(timerInterval);
                 currentHP = Math.max(0, currentHP - 15);
                 updateHPDisplay();
@@ -590,6 +598,9 @@
             const p = document.getElementById('password-input').value;
             createUserWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
         };
+
+        // Initialize UI with saved timer pref
+        updateTimerUI();
     </script>
 </body>
 </html>
