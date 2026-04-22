@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TabTamer | Project Pomo-mon MVP (Sprint 5)</title>
+    <title>TabTamer | Project Pomo-mon MVP (Sprint 5.1)</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -50,7 +50,6 @@
             filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.3));
             margin: 0 auto;
             image-rendering: pixelated;
-            /* Default animation applied. JS adjusts duration/iteration if needed */
             animation: play-sprite 0.8s steps(4) infinite;
         }
 
@@ -110,7 +109,7 @@
         
         .gba-mini-sprite {
             width: 40px; height: 40px;
-            background-size: 160px 40px; /* 4 frames scaled down */
+            background-size: 160px 40px;
             background-repeat: no-repeat;
             image-rendering: pixelated;
         }
@@ -132,7 +131,7 @@
 </head>
 <body>
 
-    <div id="mobile-debug">System Status: V5 Evolution Engine Active</div>
+    <div id="mobile-debug">System Status: V5.1 Bugfixes Deployed</div>
 
     <div class="container">
         <h1>TabTamer</h1>
@@ -356,14 +355,17 @@
             const snap = await getDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId));
             if(snap.exists()){
                 const data = snap.data();
-                currentHP = data.hp;
-                currentPomoId = data.pomodexId;
-                const pomoMeta = getPomoData(currentPomoId);
+                
+                // BUGFIX: Handle legacy firebase data that didn't have a numeric pomodexId
+                currentHP = data.hp !== undefined ? data.hp : 100;
+                currentPomoId = data.pomodexId || 1; 
+                
+                const pomoMeta = getPomoData(currentPomoId) || getPomoData(1);
 
                 updateHPDisplay();
                 spriteRenderer.innerHTML = `
                     <div id="active-sprite-img" class="sprite-viewport"></div>
-                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px;">${pomoMeta.name} (Lv. ${data.xp} XP)</div>
+                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px;">${pomoMeta.name} (Lv. ${data.xp || 0} XP)</div>
                 `;
                 setPomomonState('idle'); // Initialize the dynamic sprite
             }
@@ -374,48 +376,39 @@
             const spriteDiv = document.getElementById('active-sprite-img');
             if (!spriteDiv || !currentPomoId) return;
 
-            // Map standard attack to action1 based on naming convention
-            let fileNameState = stateName === 'attack' ? 'action1' : stateName;
-
-            // Dynamically inject the background image
-            spriteDiv.style.backgroundImage = `url('Pomomon${currentPomoId}_${fileNameState}_strip.png')`;
+            // BUGFIX: Strictly enforce lowercase to respect GitHub Pages (Linux) file system
+            // BUGFIX: Directly use the stateName without mapping to 'action1'
+            const fileName = `pomomon${currentPomoId}_${stateName}_strip.png`.toLowerCase();
+            spriteDiv.style.backgroundImage = `url('${fileName}')`;
 
             // Adjust animation rules dynamically
-            if (stateName === 'attack' || stateName === 'action1') {
+            if (stateName === 'attack') {
                 spriteDiv.style.animation = 'play-sprite 0.6s steps(4) 1 forwards';
             } else {
                 spriteDiv.style.animation = 'play-sprite 0.8s steps(4) infinite';
             }
         }
 
-        // --- EVOLUTION ENGINE ---
-        async function checkEvolution(docId) {
-            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", docId));
-            if(!snap.exists()) return;
-            
-            const data = snap.data();
-            const pomoMeta = getPomoData(data.pomodexId);
-            
-            if (pomoMeta.nextEvolutionId && data.xp >= pomoMeta.evolutionXpThreshold) {
-                const evolvedPomo = getPomoData(pomoMeta.nextEvolutionId);
-                
-                // Massive visual alert
-                alert(`WHAT? ${pomoMeta.name} is evolving!\n\n✨ YOUR POMO-MON EVOLVED INTO ${evolvedPomo.name.toUpperCase()}! ✨`);
-                
-                // Update Firebase with new ID
-                await updateDoc(doc(db, "players", currentUserUid, "roster", docId), {
-                    pomodexId: evolvedPomo.id
-                });
-                
-                // Instantly reload UI
-                await initMonster();
+        // Update UI when timer input changes manually
+        document.getElementById('time-input').addEventListener('input', (e) => {
+            if (!isRunning) {
+                let mins = parseInt(e.target.value);
+                if (isNaN(mins) || mins < 1) mins = 25;
+                timeLeft = mins * 60;
+                updateTimerUI();
             }
-        }
+        });
 
         // --- TIMER & GAMEPLAY LOGIC ---
         document.getElementById('start-btn').onclick = () => {
             if (isRunning) return;
             if (currentHP <= 0) return alert("Your Pomo-mon is fainted! Heal it in the Farm.");
+            
+            // BUGFIX: Grab the current value from the custom timer input box just before starting
+            let focusMins = parseInt(document.getElementById('time-input').value);
+            if (isNaN(focusMins) || focusMins < 1) focusMins = 25;
+            timeLeft = focusMins * 60;
+
             isRunning = true;
             setPomomonState('walk');
             document.getElementById('start-btn').innerText = "FOCUSING...";
@@ -442,24 +435,44 @@
 
         function completeSession() {
             clearInterval(timerInterval);
-            setPomomonState('action1'); // Triggers dynamic attack animation
+            setPomomonState('attack'); // Now correctly matches your "attack" filenames
             
             setTimeout(async () => {
                 alert("Session Complete! +50 XP");
                 
-                // 1. Award XP
                 await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { xp: increment(50) });
-                
-                // 2. Check for Evolution Trigger
                 await checkEvolution(activeMonsterDocId);
                 
                 resetSession();
             }, 600);
         }
 
+        // --- EVOLUTION ENGINE ---
+        async function checkEvolution(docId) {
+            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", docId));
+            if(!snap.exists()) return;
+            
+            const data = snap.data();
+            const pomoMeta = getPomoData(data.pomodexId);
+
+            if (pomoMeta.nextEvolutionId && data.xp >= pomoMeta.evolutionXpThreshold) {
+                const evolvedPomo = getPomoData(pomoMeta.nextEvolutionId);
+                
+                alert(`WHAT? ${pomoMeta.name} is evolving!\n\n✨ YOUR POMO-MON EVOLVED INTO ${evolvedPomo.name.toUpperCase()}! ✨`);
+                
+                await updateDoc(doc(db, "players", currentUserUid, "roster", docId), {
+                    pomodexId: evolvedPomo.id
+                });
+                
+                await initMonster();
+            }
+        }
+
         function resetSession() {
             isRunning = false;
-            timeLeft = document.getElementById('time-input').value * 60;
+            let mins = parseInt(document.getElementById('time-input').value);
+            if (isNaN(mins) || mins < 1) mins = 25;
+            timeLeft = mins * 60;
             document.getElementById('start-btn').innerText = "Start Session";
             setPomomonState('idle');
             updateTimerUI();
@@ -478,9 +491,11 @@
                 const cell = document.createElement('div');
                 cell.className = 'gba-cell';
                 if (rosterData[i]) {
-                    const pData = getPomoData(rosterData[i].pomodexId);
-                    // Use dynamic inline styling for mini-sprites too
-                    cell.innerHTML = `<div class="gba-mini-sprite" style="background-image: url('Pomomon${pData.id}_idle_strip.png');"></div>`;
+                    // BUGFIX: Added fallback so legacy Firebase records don't crash the grid
+                    let safeId = rosterData[i].pomodexId || 1; 
+                    const pData = getPomoData(safeId) || getPomoData(1);
+                    
+                    cell.innerHTML = `<div class="gba-mini-sprite" style="background-image: url('pomomon${pData.id}_idle_strip.png');"></div>`;
                     cell.onclick = () => selectMonster(rosterData[i], pData, cell);
                 }
                 grid.appendChild(cell);
@@ -492,9 +507,13 @@
             cellElement.classList.add('selected');
             selectedMonsterDocId = rosterEntry.docId;
 
+            // BUGFIX: Displaying fallback HP if missing
+            let displayHp = rosterEntry.hp !== undefined ? rosterEntry.hp : 100;
+            let displayXp = rosterEntry.xp !== undefined ? rosterEntry.xp : 0;
+
             document.getElementById('summary-content').innerHTML = `
                 <strong>${pomoMeta.name}</strong><br>
-                HP: ${rosterEntry.hp}/100 | XP: ${rosterEntry.xp}
+                HP: ${displayHp}/100 | XP: ${displayXp}
             `;
             document.getElementById('gba-equip-btn').style.display = 'block';
         }
