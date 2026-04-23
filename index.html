@@ -14,8 +14,8 @@
             --text-muted: #8b949e;
 
             /* SPRITE MATH */
-            --frame-width: 118px; 
-            --frame-height: 120px;
+            --frame-width: 200px;  /* Changed from 118px */
+            --frame-height: 200px; /* Changed from 120px */
 
             /* GBA PALETTE */
             --gba-mint: #98d8b8;
@@ -352,10 +352,25 @@
                 const pomoMeta = getPomoData(currentPomoId) || getPomoData(1);
 
                 updateHPDisplay();
+
+                // --- NEW STATS MATH ---
+                let xpToNextLevel = 100 - (currentXp % 100);
+                let evoText = "";
+                
+                if (pomoMeta.nextEvolutionId) {
+                    let targetLevel = Math.floor(pomoMeta.evolutionXpThreshold / 100) + 1;
+                    let levelsLeft = targetLevel - currentLevel;
+                    evoText = `<br><span style="color:var(--text-muted); font-size:0.75rem;">(Evolves in ${levelsLeft} Levels)</span>`;
+                } else {
+                    evoText = `<br><span style="color:var(--gba-selected); font-size:0.75rem;">(Max Evolution)</span>`;
+                }
+
                 spriteRenderer.innerHTML = `
                     <div id="active-sprite-img" class="sprite-viewport"></div>
-                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px;">
+                    <div style="font-weight:bold; color:var(--neon-green); margin-top:5px; text-align:center;">
                         ${pomoMeta.name} (Lv. ${currentLevel} | ${currentXp} XP)
+                        <br><span style="color:var(--text-main); font-size:0.85rem;">${xpToNextLevel} XP to next Level</span>
+                        ${evoText}
                     </div>
                 `;
                 setPomomonState('idle'); 
@@ -368,6 +383,10 @@
 
             const fileName = `pomomon${currentPomoId}_${stateName}_strip.png`.toLowerCase();
             spriteDiv.style.backgroundImage = `url('${fileName}')`;
+
+            // CRITICAL FIX: Force the browser to reset the animation clock
+            spriteDiv.style.animation = 'none';
+            void spriteDiv.offsetWidth; // This weird line forces a browser "reflow" (redraw)
 
             if (stateName === 'attack') {
                 spriteDiv.style.animation = 'play-sprite 0.6s steps(4) 1 forwards';
