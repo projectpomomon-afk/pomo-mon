@@ -149,8 +149,8 @@
         <div id="egg-selection" style="display: none;">
             <h3>Pick your starter egg!</h3>
             <div class="egg-container">
-                <button class="egg-btn" onclick="claimStarter(1)">🔥<br>FIRE</button>
-                <button class="egg-btn" onclick="claimStarter(4)">💧<br>WATER</button>
+                <button class="egg-btn" onclick="claimStarter(1)">🐣<br>FIRE</button>
+                <button class="egg-btn" onclick="claimStarter(4)">🌊<br>WATER</button>
                 <button class="egg-btn" onclick="claimStarter(7)">🌿<br>GRASS</button>
             </div>
         </div>
@@ -206,10 +206,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"; // Note: Ensure firestore imports are correct in your final environment
-        import { getFirestore as getDB } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        // Re-importing specific firestore functions from firestore module
-        import { doc as fsDoc, getDoc as fsGetDoc, setDoc as fsSetDoc, updateDoc as fsUpdateDoc, increment as fsIncrement, collection as fsCollection, getDocs as fsGetDocs, addDoc as fsAddDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore as getDB, doc as fsDoc, getDoc as fsGetDoc, setDoc as fsSetDoc, updateDoc as fsUpdateDoc, increment as fsIncrement, collection as fsCollection, getDocs as fsGetDocs, addDoc as fsAddDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyABCxcL0uRz_ypOjjCb_lsft0AWOTO--Ls",
@@ -467,7 +464,7 @@
                     pomodexId: evolvedPomo.id
                 });
                 
-                alert(`WHAT? ${pomoMeta.name} is evolving! 🌟`);
+                alert(`WHAT? ${pomoMeta.name} is evolving! ✨`);
             }
 
             await initMonster(); 
