@@ -149,8 +149,8 @@
         <div id="egg-selection" style="display: none;">
             <h3>Pick your starter egg!</h3>
             <div class="egg-container">
-                <button class="egg-btn" onclick="claimStarter(1)">🐣<br>FIRE</button>
-                <button class="egg-btn" onclick="claimStarter(4)">🌊<br>WATER</button>
+                <button class="egg-btn" onclick="claimStarter(1)">🔥<br>FIRE</button>
+                <button class="egg-btn" onclick="claimStarter(4)">💧<br>WATER</button>
                 <button class="egg-btn" onclick="claimStarter(7)">🌿<br>GRASS</button>
             </div>
         </div>
@@ -432,22 +432,27 @@
             clearInterval(timerInterval);
             isRunning = false; // Stop the penalty check immediately
             
+            // 1. Trigger the attack animation
             setPomomonState('attack'); 
+            
+            // 2. CRITICAL FIX: Wait for 600ms so the CSS animation actually plays 
+            // before the browser moves on and freezes the screen!
+            await new Promise(resolve => setTimeout(resolve, 600));
             
             const xpGained = activeFocusMins * 10;
             
-            // 1. Update the UI first so it doesn't look "stuck"
+            // 3. Update the UI button so it doesn't look "stuck" on Focusing
             document.getElementById('start-btn').innerText = "Start Session";
             
-            // 2. Wait for the database to actually save the XP
+            // 4. Save to database
             await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { 
                 xp: increment(xpGained) 
             });
             
-            // 3. Check for evolution and RE-DRAW the sprite
+            // 5. Check for evolution and update the visual stats
             await checkEvolution(activeMonsterDocId);
             
-            // 4. Final UI Cleanup
+            // 6. Alert the user and reset
             alert(`Session Complete! +${xpGained} XP`);
             resetSession();
         }
@@ -471,7 +476,7 @@
                     pomodexId: evolvedPomo.id
                 });
                 
-                alert(`WHAT? ${pomoMeta.name} is evolving! ✨`);
+                alert(`WHAT? ${pomoMeta.name} is evolving! 🌟`);
             }
 
             // CRITICAL: Re-run initMonster to refresh the Level, XP, and Sprite visually
