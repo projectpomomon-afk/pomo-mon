@@ -149,8 +149,8 @@
         <div id="egg-selection" style="display: none;">
             <h3>Pick your starter egg!</h3>
             <div class="egg-container">
-                <button class="egg-btn" onclick="claimStarter(1)">🔥<br>FIRE</button>
-                <button class="egg-btn" onclick="claimStarter(4)">💧<br>WATER</button>
+                <button class="egg-btn" onclick="claimStarter(1)">🐣<br>FIRE</button>
+                <button class="egg-btn" onclick="claimStarter(4)">🌊<br>WATER</button>
                 <button class="egg-btn" onclick="claimStarter(7)">🌿<br>GRASS</button>
             </div>
         </div>
@@ -428,47 +428,53 @@
             }
         };
 
-        function completeSession() {
+        async function completeSession() {
             clearInterval(timerInterval);
-            
-            // BUGFIX: Immediately toggle isRunning so the incoming alert doesn't trigger a window blur penalty
-            isRunning = false; 
+            isRunning = false; // Stop the penalty check immediately
             
             setPomomonState('attack'); 
             
-            // BUGFIX: Dynamic XP Scaling (1 min = 10 XP)
             const xpGained = activeFocusMins * 10;
             
-            setTimeout(async () => {
-                alert(`Session Complete! +${xpGained} XP`);
-                
-                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { xp: increment(xpGained) });
-                await checkEvolution(activeMonsterDocId);
-                
-                resetSession();
-            }, 600);
+            // 1. Update the UI first so it doesn't look "stuck"
+            document.getElementById('start-btn').innerText = "Start Session";
+            
+            // 2. Wait for the database to actually save the XP
+            await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { 
+                xp: increment(xpGained) 
+            });
+            
+            // 3. Check for evolution and RE-DRAW the sprite
+            await checkEvolution(activeMonsterDocId);
+            
+            // 4. Final UI Cleanup
+            alert(`Session Complete! +${xpGained} XP`);
+            resetSession();
         }
 
         // --- EVOLUTION ENGINE ---
         async function checkEvolution(docId) {
+            // Force a fresh fetch of the data we just saved
             const snap = await getDoc(doc(db, "players", currentUserUid, "roster", docId));
             if(!snap.exists()) return;
             
             const data = snap.data();
             const pomoMeta = getPomoData(data.pomodexId);
-            
             let currentXp = Number(data.xp) || 0;
 
+            // Check if evolution threshold met
             if (pomoMeta.nextEvolutionId && currentXp >= pomoMeta.evolutionXpThreshold) {
                 const evolvedPomo = getPomoData(pomoMeta.nextEvolutionId);
                 
-                alert(`WHAT? ${pomoMeta.name} is evolving!\n\n✨ YOUR POMO-MON EVOLVED INTO ${evolvedPomo.name.toUpperCase()}! ✨`);
-                
+                // Update database to the new ID
                 await updateDoc(doc(db, "players", currentUserUid, "roster", docId), {
                     pomodexId: evolvedPomo.id
                 });
+                
+                alert(`WHAT? ${pomoMeta.name} is evolving! ✨`);
             }
-            // Always refresh UI to update new Level/XP/Sprite
+
+            // CRITICAL: Re-run initMonster to refresh the Level, XP, and Sprite visually
             await initMonster(); 
         }
 
