@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TabTamer | Project Pomo-mon MVP (Sprint 5.2)</title>
+    <title>TabTamer | Project Pomo-mon MVP (Sprint 5.3)</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -131,7 +131,7 @@
 </head>
 <body>
 
-    <div id="mobile-debug">System Status: V5.2 Logic Patches Active</div>
+    <div id="mobile-debug">System Status: V5.3 Start-Attack Logic Active</div>
 
     <div class="container">
         <h1>TabTamer</h1>
@@ -206,7 +206,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"; // Note: Ensure firestore imports are correct in your final environment
+        import { getFirestore as getDB } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        // Re-importing specific firestore functions from firestore module
+        import { doc as fsDoc, getDoc as fsGetDoc, setDoc as fsSetDoc, updateDoc as fsUpdateDoc, increment as fsIncrement, collection as fsCollection, getDocs as fsGetDocs, addDoc as fsAddDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyABCxcL0uRz_ypOjjCb_lsft0AWOTO--Ls",
@@ -219,7 +222,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getDB(app);
 
         // --- THE POMODEX (17 Families, 3 Stages) ---
         const POMODEX = [
@@ -285,24 +288,21 @@
         let currentPomoId = null; 
         let currentHP = 100;
         let timeLeft = 25 * 60;
-        let activeFocusMins = 25; // Store active mins to calculate XP
+        let activeFocusMins = 25; 
         let isRunning = false;
         let timerInterval;
         let rosterData = [];
         let selectedMonsterDocId = null;
 
-        // Load saved timer preference or default to 25
         const savedTimer = localStorage.getItem('pomoTimerPref') || 25;
         document.getElementById('time-input').value = savedTimer;
         timeLeft = savedTimer * 60;
 
-        // UI Selectors
         const spriteRenderer = document.getElementById('sprite-renderer');
         const timerDisplay = document.getElementById('timer');
         const hpFill = document.getElementById('hp-fill');
         const hpText = document.getElementById('hp-text');
 
-        // --- AUTH & ECOSYSTEM ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserUid = user.uid;
@@ -312,7 +312,7 @@
         });
 
         async function checkPlayerEcosystem(uid) {
-            const snap = await getDoc(doc(db, "players", uid));
+            const snap = await fsGetDoc(fsDoc(db, "players", uid));
             if (snap.exists() && snap.data().active_pomomon_id) {
                 activeMonsterDocId = snap.data().active_pomomon_id;
                 showArena();
@@ -325,8 +325,8 @@
 
         window.claimStarter = async (starterId) => {
             const newMonster = { pomodexId: starterId, hp: 100, xp: 0 };
-            const docRef = await addDoc(collection(db, "players", currentUserUid, "roster"), newMonster);
-            await setDoc(doc(db, "players", currentUserUid), { active_pomomon_id: docRef.id });
+            const docRef = await fsAddDoc(fsCollection(db, "players", currentUserUid, "roster"), newMonster);
+            await fsSetDoc(fsDoc(db, "players", currentUserUid), { active_pomomon_id: docRef.id });
             
             activeMonsterDocId = docRef.id;
             document.getElementById('egg-selection').style.display = 'none';
@@ -341,15 +341,12 @@
         }
 
         async function initMonster() {
-            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId));
+            const snap = await fsGetDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId));
             if(snap.exists()){
                 const data = snap.data();
-                
-                // BUGFIX: Clean up NaN HP Database errors
                 currentHP = Number(data.hp);
                 if (isNaN(currentHP)) currentHP = 100;
 
-                // BUGFIX: Calculate real Level and XP
                 let currentXp = Number(data.xp);
                 if (isNaN(currentXp)) currentXp = 0;
                 let currentLevel = Math.floor(currentXp / 100) + 1;
@@ -368,7 +365,6 @@
             }
         }
 
-        // --- DYNAMIC SPRITE ENGINE ---
         function setPomomonState(stateName) {
             const spriteDiv = document.getElementById('active-sprite-img');
             if (!spriteDiv || !currentPomoId) return;
@@ -383,35 +379,44 @@
             }
         }
 
-        // Timer Input Listener
         document.getElementById('time-input').addEventListener('input', (e) => {
             if (!isRunning) {
                 let mins = parseInt(e.target.value);
                 if (isNaN(mins) || mins < 1) mins = 25;
                 timeLeft = mins * 60;
-                localStorage.setItem('pomoTimerPref', mins); // Remember preference on refresh
+                localStorage.setItem('pomoTimerPref', mins); 
                 updateTimerUI();
             }
         });
 
-        // --- TIMER & GAMEPLAY LOGIC ---
-        document.getElementById('start-btn').onclick = () => {
+        // --- UPDATED START BUTTON LOGIC ---
+        document.getElementById('start-btn').onclick = async () => {
             if (isRunning) return;
             if (currentHP <= 0) return alert("Your Pomo-mon is fainted! Heal it in the Farm.");
             
             let focusMins = parseInt(document.getElementById('time-input').value);
             if (isNaN(focusMins) || focusMins < 1) focusMins = 25;
             timeLeft = focusMins * 60;
-            activeFocusMins = focusMins; // Lock in the minutes for XP calc
+            activeFocusMins = focusMins; 
 
             isRunning = true;
-            setPomomonState('walk');
             document.getElementById('start-btn').innerText = "FOCUSING...";
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerUI();
-                if (timeLeft <= 0) completeSession();
-            }, 1000);
+            
+            // 1. Play the attack animation first!
+            setPomomonState('attack');
+            
+            // 2. Wait exactly 600ms for the animation to finish
+            await new Promise(resolve => setTimeout(resolve, 600));
+            
+            // 3. Switch to walk and start the timer
+            if (isRunning) {
+                setPomomonState('walk');
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerUI();
+                    if (timeLeft <= 0) completeSession();
+                }, 1000);
+            }
         };
 
         document.getElementById('give-up-btn').onclick = async () => {
@@ -422,64 +427,49 @@
                 currentHP = Math.max(0, currentHP - 20);
                 updateHPDisplay();
                 setPomomonState('idle');
-                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
+                await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
                 resetSession();
                 alert("Session abandoned. Pomo-mon took 20 damage.");
             }
         };
 
+        // --- UPDATED COMPLETE SESSION LOGIC ---
         async function completeSession() {
             clearInterval(timerInterval);
-            isRunning = false; // Stop the penalty check immediately
-            
-            // 1. Trigger the attack animation
-            setPomomonState('attack'); 
-            
-            // 2. CRITICAL FIX: Wait for 600ms so the CSS animation actually plays 
-            // before the browser moves on and freezes the screen!
-            await new Promise(resolve => setTimeout(resolve, 600));
+            isRunning = false; 
             
             const xpGained = activeFocusMins * 10;
             
-            // 3. Update the UI button so it doesn't look "stuck" on Focusing
             document.getElementById('start-btn').innerText = "Start Session";
             
-            // 4. Save to database
-            await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { 
-                xp: increment(xpGained) 
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { 
+                xp: fsIncrement(xpGained) 
             });
             
-            // 5. Check for evolution and update the visual stats
             await checkEvolution(activeMonsterDocId);
             
-            // 6. Alert the user and reset
             alert(`Session Complete! +${xpGained} XP`);
             resetSession();
         }
 
-        // --- EVOLUTION ENGINE ---
         async function checkEvolution(docId) {
-            // Force a fresh fetch of the data we just saved
-            const snap = await getDoc(doc(db, "players", currentUserUid, "roster", docId));
+            const snap = await fsGetDoc(fsDoc(db, "players", currentUserUid, "roster", docId));
             if(!snap.exists()) return;
             
             const data = snap.data();
             const pomoMeta = getPomoData(data.pomodexId);
             let currentXp = Number(data.xp) || 0;
 
-            // Check if evolution threshold met
             if (pomoMeta.nextEvolutionId && currentXp >= pomoMeta.evolutionXpThreshold) {
                 const evolvedPomo = getPomoData(pomoMeta.nextEvolutionId);
                 
-                // Update database to the new ID
-                await updateDoc(doc(db, "players", currentUserUid, "roster", docId), {
+                await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", docId), {
                     pomodexId: evolvedPomo.id
                 });
                 
                 alert(`WHAT? ${pomoMeta.name} is evolving! 🌟`);
             }
 
-            // CRITICAL: Re-run initMonster to refresh the Level, XP, and Sprite visually
             await initMonster(); 
         }
 
@@ -493,15 +483,13 @@
             updateTimerUI();
         }
 
-        // --- GBA FARM LOGIC ---
         async function loadFarm() {
             const grid = document.getElementById('gba-grid');
             grid.innerHTML = '';
-            const snap = await getDocs(collection(db, "players", currentUserUid, "roster"));
+            const snap = await fsGetDocs(fsCollection(db, "players", currentUserUid, "roster"));
             rosterData = [];
             snap.forEach(d => rosterData.push({ docId: d.id, ...d.data() }));
 
-            // Generate 30 cells (5x6)
             for (let i = 0; i < 30; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'gba-cell';
@@ -521,7 +509,6 @@
             cellElement.classList.add('selected');
             selectedMonsterDocId = rosterEntry.docId;
 
-            // BUGFIX: Safe display math for farm 
             let displayHp = Number(rosterEntry.hp);
             if(isNaN(displayHp)) displayHp = 100;
             
@@ -539,7 +526,7 @@
 
         document.getElementById('gba-equip-btn').onclick = async () => {
             if (!selectedMonsterDocId) return;
-            await updateDoc(doc(db, "players", currentUserUid), { active_pomomon_id: selectedMonsterDocId });
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid), { active_pomomon_id: selectedMonsterDocId });
             activeMonsterDocId = selectedMonsterDocId;
             document.getElementById('nav-arena').click();
         };
@@ -550,7 +537,6 @@
             document.getElementById('gba-equip-btn').style.display = 'none';
         };
 
-        // --- HELPERS ---
         function updateHPDisplay() {
             hpFill.style.width = currentHP + "%";
             hpText.innerText = `${currentHP} / 100`;
@@ -563,14 +549,13 @@
             timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
         }
 
-        // Visibility Penalty
         window.onblur = async () => {
-            if (isRunning && timeLeft > 0) { // Added double check so it doesn't fire at end of session
+            if (isRunning && timeLeft > 0) { 
                 clearInterval(timerInterval);
                 currentHP = Math.max(0, currentHP - 15);
                 updateHPDisplay();
                 setPomomonState('idle');
-                await updateDoc(doc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
+                await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
                 document.getElementById('penalty-modal').classList.add('active');
             }
         };
@@ -581,7 +566,6 @@
             document.getElementById('start-btn').click();
         };
 
-        // Navigation
         document.getElementById('nav-arena').onclick = () => {
             showArena();
             document.getElementById('nav-arena').classList.add('active');
@@ -597,7 +581,6 @@
             loadFarm();
         };
 
-        // Auth Buttons
         document.getElementById('login-btn').onclick = () => {
             const e = document.getElementById('email-input').value;
             const p = document.getElementById('password-input').value;
@@ -610,7 +593,6 @@
             createUserWithEmailAndPassword(auth, e, p).catch(err => alert(err.message));
         };
 
-        // Initialize UI with saved timer pref
         updateTimerUI();
     </script>
 </body>
