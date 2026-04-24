@@ -176,9 +176,8 @@
                 <button id="start-btn">Start Session</button>
                 <button id="give-up-btn">Give Up</button>
             </div>
-        </div>
-        
-        <div id="farm-section" style="display:none;">
+                    </div>
+                            <div id="farm-section" style="display:none;">
             <h4 class="pixel-font" style="font-size:0.7rem; margin-bottom:8px;">POMO-MON STORAGE</h4>
             <div id="gba-grid" class="gba-grid"></div>
             
@@ -236,8 +235,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        // Swapped to signInWithRedirect for mobile browser stability
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore as getDB, doc as fsDoc, getDoc as fsGetDoc, setDoc as fsSetDoc, updateDoc as fsUpdateDoc, increment as fsIncrement, collection as fsCollection, getDocs as fsGetDocs, addDoc as fsAddDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -331,15 +329,6 @@
         const hpFill = document.getElementById('hp-fill');
         const hpText = document.getElementById('hp-text');
 
-        // Check Google Redirect Result
-        getRedirectResult(auth).then((result) => {
-            if (result) {
-                alert("Google Sign In Successful!");
-            }
-        }).catch((error) => {
-            alert("Google Sign In Error: " + error.message);
-        });
-
         // --- AUTH & INITIALIZATION ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -421,6 +410,13 @@
                         ${evoText}
                     </div>
                 `;
+
+                // Preload animations to prevent white flashes
+                const imgAttack = new Image();
+                imgAttack.src = `pomomon${currentPomoId}_attack_strip.png`.toLowerCase();
+                const imgWalk = new Image();
+                imgWalk.src = `pomomon${currentPomoId}_walk_strip.png`.toLowerCase();
+
                 setPomomonState('idle'); 
             }
         }
@@ -436,7 +432,7 @@
             void spriteDiv.offsetWidth; 
 
             if (stateName === 'attack') {
-                spriteDiv.style.animation = 'play-sprite 0.6s steps(4) 1 forwards';
+                spriteDiv.style.animation = 'play-sprite 0.6s steps(4) forwards';
             } else {
                 spriteDiv.style.animation = 'play-sprite 0.8s steps(4) infinite';
             }
@@ -695,8 +691,16 @@
 
         document.getElementById('resume-btn').onclick = () => {
             document.getElementById('penalty-modal').classList.remove('active');
-            isRunning = false;
-            document.getElementById('start-btn').click();
+            
+            // Resume the existing timer natively without resetting timeLeft
+            isRunning = true;
+            document.getElementById('start-btn').innerText = "FOCUSING...";
+            setPomomonState('walk');
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                if (timeLeft <= 0) completeSession();
+            }, 1000);
         };
 
         // --- NAVIGATION BAR ---
@@ -721,7 +725,7 @@
         document.getElementById('nav-shop').onclick = () => switchTab('shop');
         document.getElementById('nav-pomodex').onclick = () => switchTab('pomodex');
 
-        // --- AUTHENTICATION BUTTONS (With Catch Alerts) ---
+        // --- AUTHENTICATION BUTTONS ---
         document.getElementById('login-btn').onclick = async () => {
             const e = document.getElementById('email-input').value;
             const p = document.getElementById('password-input').value;
@@ -751,9 +755,8 @@
 
         document.getElementById('google-btn').onclick = async () => {
             try {
-                alert("Opening Google Sign-In...");
                 const provider = new GoogleAuthProvider();
-                await signInWithRedirect(auth, provider);
+                await signInWithPopup(auth, provider);
             } catch (err) {
                 alert("Google Auth Failed: " + err.message);
             }
