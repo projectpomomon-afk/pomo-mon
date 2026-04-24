@@ -544,7 +544,7 @@
             setPomomonState('idle');
             updateTimerUI();
         }
-
+        
         // --- ITEM SHOP LOGIC ---
         window.buyItem = async (itemType, cost) => {
             if (currentCoins < cost) {
@@ -569,4 +569,197 @@
                 alert("Used Super Potion! Healed 50 HP.");
             } 
             else if (itemType === 'egg') {
-                const baseStages = [1, 4, 7, 10, 13, 16, 19, 22,
+                const baseStages = [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49];
+                const randomId = baseStages[Math.floor(Math.random() * baseStages.length)];
+                await fsAddDoc(fsCollection(db, "players", currentUserUid, "roster"), { pomodexId: randomId, hp: 100, xp: 0 });
+                alert("The egg hatched! A new Pomo-mon was sent to your Farm.");
+            }
+        };
+
+        // --- FARM LOGIC ---
+        async function loadFarm() {
+            if(!currentUserUid) return alert("You must be logged in to view the Farm.");
+            const grid = document.getElementById('gba-grid');
+            grid.innerHTML = '';
+            const snap = await fsGetDocs(fsCollection(db, "players", currentUserUid, "roster"));
+            rosterData = [];
+            snap.forEach(d => rosterData.push({ docId: d.id, ...d.data() }));
+
+            for (let i = 0; i < 30; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'gba-cell';
+                if (rosterData[i]) {
+                    let safeId = rosterData[i].pomodexId || 1; 
+                    const pData = getPomoData(safeId) || getPomoData(1);
+                    
+                    cell.innerHTML = `<div class="gba-mini-sprite" style="background-image: url('pomomon${pData.id}_idle_strip.png');"></div>`;
+                    cell.onclick = () => selectMonster(rosterData[i], pData, cell);
+                }
+                grid.appendChild(cell);
+            }
+        }
+
+        function selectMonster(rosterEntry, pomoMeta, cellElement) {
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+            cellElement.classList.add('selected');
+            selectedMonsterDocId = rosterEntry.docId;
+
+            let displayHp = Number(rosterEntry.hp);
+            if(isNaN(displayHp)) displayHp = 100;
+            
+            let displayXp = Number(rosterEntry.xp);
+            if(isNaN(displayXp)) displayXp = 0;
+            let displayLevel = Math.floor(displayXp / 100) + 1;
+
+            document.getElementById('summary-content').innerHTML = `
+                <strong>${pomoMeta.name}</strong><br>
+                HP: ${displayHp}/100<br>
+                Lv. ${displayLevel} | ${displayXp} XP
+            `;
+            document.getElementById('gba-equip-btn').style.display = 'block';
+        }
+
+        document.getElementById('gba-equip-btn').onclick = async () => {
+            if (!selectedMonsterDocId) return;
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid), { active_pomomon_id: selectedMonsterDocId });
+            activeMonsterDocId = selectedMonsterDocId;
+            document.getElementById('nav-arena').click();
+        };
+
+        document.getElementById('gba-cancel-btn').onclick = () => {
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+            document.getElementById('summary-content').innerText = 'Select a Pomo-mon...';
+            document.getElementById('gba-equip-btn').style.display = 'none';
+        };
+
+        // --- POMODEX LOGIC ---
+        async function loadDex() {
+            if(!currentUserUid) return alert("You must be logged in to view the Pomo-Dex.");
+            const grid = document.getElementById('dex-grid');
+            grid.innerHTML = '';
+            
+            const snap = await fsGetDocs(fsCollection(db, "players", currentUserUid, "roster"));
+            const ownedIds = [];
+            snap.forEach(d => ownedIds.push(d.data().pomodexId));
+
+            POMODEX.forEach(pomo => {
+                const isOwned = ownedIds.includes(pomo.id);
+                const cell = document.createElement('div');
+                
+                const filterStyle = isOwned ? '' : 'filter: brightness(0) opacity(0.2);';
+                const bgColor = isOwned ? 'var(--gba-mint)' : '#e0e0e0';
+                
+                cell.className = 'gba-cell';
+                cell.style.background = bgColor;
+                cell.style.borderRadius = "4px";
+                
+                cell.innerHTML = `
+                    <div class="gba-mini-sprite" style="background-image: url('pomomon${pomo.id}_idle_strip.png'); ${filterStyle}"></div>
+                    <div style="position:absolute; bottom:2px; right: 4px; font-size:9px; font-family: monospace; font-weight:bold; color: #333;">#${pomo.id}</div>
+                `;
+                
+                cell.onclick = () => {
+                    if(isOwned) alert(`No. ${pomo.id}: ${pomo.name}\nYou have discovered this Pomo-mon!`);
+                    else alert(`No. ${pomo.id}: ???\nKeep focusing and evolving to discover this Pomo-mon!`);
+                };
+                grid.appendChild(cell);
+            });
+        }
+
+        // --- HELPERS & PENALTY ---
+        function updateHPDisplay() {
+            hpFill.style.width = currentHP + "%";
+            hpText.innerText = `${currentHP} / 100`;
+            
+            if (currentHP > 50) hpFill.style.backgroundColor = "var(--neon-green)";
+            else if (currentHP > 20) hpFill.style.backgroundColor = "var(--gba-gold)";
+            else hpFill.style.backgroundColor = "var(--neon-red)";
+        }
+
+        function updateTimerUI() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+
+        window.onblur = async () => {
+            if (isRunning && timeLeft > 0) { 
+                clearInterval(timerInterval);
+                currentHP = Math.max(0, currentHP - 15);
+                updateHPDisplay();
+                setPomomonState('idle');
+                await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
+                document.getElementById('penalty-modal').classList.add('active');
+            }
+        };
+
+        document.getElementById('resume-btn').onclick = () => {
+            document.getElementById('penalty-modal').classList.remove('active');
+            isRunning = false;
+            document.getElementById('start-btn').click();
+        };
+
+        // --- NAVIGATION BAR ---
+        function switchTab(tabName) {
+            if(isRunning) return alert("Finish your focus session first!");
+            
+            document.getElementById('game-section').style.display = tabName === 'arena' ? 'block' : 'none';
+            document.getElementById('farm-section').style.display = tabName === 'farm' ? 'block' : 'none';
+            document.getElementById('shop-section').style.display = tabName === 'shop' ? 'block' : 'none';
+            document.getElementById('pomodex-section').style.display = tabName === 'pomodex' ? 'block' : 'none';
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${tabName}`).classList.add('active');
+
+            if(tabName === 'farm') loadFarm();
+            if(tabName === 'arena') initMonster();
+            if(tabName === 'pomodex') loadDex();
+        }
+
+        document.getElementById('nav-arena').onclick = () => switchTab('arena');
+        document.getElementById('nav-farm').onclick = () => switchTab('farm');
+        document.getElementById('nav-shop').onclick = () => switchTab('shop');
+        document.getElementById('nav-pomodex').onclick = () => switchTab('pomodex');
+
+        // --- AUTHENTICATION BUTTONS (With Catch Alerts) ---
+        document.getElementById('login-btn').onclick = async () => {
+            const e = document.getElementById('email-input').value;
+            const p = document.getElementById('password-input').value;
+            if(!e || !p) return alert("Please enter email and password.");
+            try {
+                document.getElementById('login-btn').innerText = "Logging in...";
+                await signInWithEmailAndPassword(auth, e, p);
+            } catch (err) {
+                alert("Login Error: " + err.message);
+                document.getElementById('login-btn').innerText = "Log In";
+            }
+        };
+
+        document.getElementById('signup-btn').onclick = async () => {
+            const e = document.getElementById('email-input').value;
+            const p = document.getElementById('password-input').value;
+            if(!e || !p) return alert("Please enter email and password.");
+            try {
+                document.getElementById('signup-btn').innerText = "Signing up...";
+                await createUserWithEmailAndPassword(auth, e, p);
+                alert("Account Created! You are logged in.");
+            } catch (err) {
+                alert("Signup Error: " + err.message);
+                document.getElementById('signup-btn').innerText = "Sign Up";
+            }
+        };
+
+        document.getElementById('google-btn').onclick = async () => {
+            try {
+                alert("Opening Google Sign-In...");
+                const provider = new GoogleAuthProvider();
+                await signInWithRedirect(auth, provider);
+            } catch (err) {
+                alert("Google Auth Failed: " + err.message);
+            }
+        };
+
+        updateTimerUI();
+    </script>
+</body>
+</html>
