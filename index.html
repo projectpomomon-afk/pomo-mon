@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TabTamer | Project Pomo-mon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #E0F8D0; 
+            --panel-bg: #FAFAFA;
+            --border-color: #2F4858;
+            --gba-mint: #98d8b8;
+            --gba-blue: #70a8a8;
+            --neon-green: #2ecc71;
+            --neon-red: #e74c3c;
+            --gba-gold: #f1c40f;
+            --text-main: #2F4858;
+            --text-muted: #7f8c8d;
+            --frame-width: 200px; 
+            --frame-height: 200px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color); color: var(--text-main);
+            font-family: 'Nunito', sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 100vh; overflow-x: hidden;
+            background-image: radial-gradient(#98d8b8 1px, transparent 1px);
+            background-size: 20px 20px; 
+        }
+
+        h1, h2, h3, h4, .pixel-font { font-family: 'Press Start 2P', cursive; }
+
+        .container {
+            background-color: var(--panel-bg); 
+            border: 6px solid var(--border-color);
+            border-radius: 12px; padding: 1.5rem; width: 95%;
+            max-width: 450px; text-align: center; 
+            box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.15); 
+        }
+
+        h1 { font-size: 1.2rem; color: var(--border-color); margin-bottom: 5px; text-transform: uppercase;}
+
+        .sprite-viewport {
+            width: var(--frame-width);
+            height: var(--frame-height);
+            background-repeat: no-repeat;
+            background-position: 0px 0px;
+            background-size: calc(var(--frame-width) * 4) var(--frame-height);
+            margin: 0 auto;
+            image-rendering: pixelated;
+            animation: play-sprite 0.8s steps(4) infinite;
+        }
+
+        @keyframes play-sprite {
+            100% { background-position: calc(var(--frame-width) * -4) 0px; }
+        }
+
+        @keyframes sprite-jump {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-30px); }
+        }
+        .jump-animation {
+            animation: sprite-jump 0.4s ease-in-out 3; 
+        }
+
+        .modal-hidden { display: none; }
+        .modal-active {
+            display: flex; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: #fff; padding: 30px;
+            border-radius: 12px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 400px;
+        }
+        .modal-buttons {
+            margin-top: 20px; display: flex;
+            justify-content: center; gap: 15px;
+        }
+        .modal-buttons button {
+            padding: 10px 20px; cursor: pointer;
+            border: none; border-radius: 6px; font-weight: bold;
+        }
+        #btn-mission-yes { background-color: #4CAF50; color: white; }
+        #btn-mission-no { background-color: #f44336; color: white; }
+
+        .top-stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; border-bottom: 2px dashed #ccc; padding-bottom: 10px; }
+        .coin-display { color: var(--gba-gold); font-size: 1.1rem; text-shadow: 1px 1px 0px #000; cursor: pointer; user-select: none; }
+
+        .hp-wrapper { margin-bottom: 1rem; text-align: left; }
+        .hp-labels { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .hp-bar-container { width: 100%; height: 16px; background-color: #ddd; border: 3px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+        #hp-fill { height: 100%; width: 100%; background-color: var(--neon-green); transition: width 0.4s ease, background-color 0.3s ease; }
+
+        .auth-input { width: 100%; padding: 0.8rem; margin-bottom: 10px; background: #fff; border: 2px solid var(--border-color); color: var(--text-main); border-radius: 6px; font-family: 'Nunito'; font-weight: bold;}
+        .nav-bar { display: none; gap: 8px; margin-bottom: 1rem; justify-content: center; padding-bottom: 10px; flex-wrap: wrap;}
+        .nav-btn { background: none; color: var(--text-muted); border: none; cursor: pointer; font-weight: bold; padding: 5px 8px; font-family: 'Press Start 2P'; font-size: 0.55rem;}
+        .nav-btn.active { color: var(--border-color); border-bottom: 4px solid var(--border-color); }
+
+        .timer-display { font-size: 3.5rem; font-weight: bold; font-family: monospace; margin: 0.5rem 0; color: var(--border-color); }
+        
+        button { padding: 0.8rem 1.2rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 3px solid var(--border-color); text-transform: uppercase; font-family: 'Nunito'; transition: transform 0.1s; }
+        button:active { transform: scale(0.95); }
+        
+        #start-btn { background: var(--neon-green); color: white; width: 60%; }
+        #give-up-btn { background: #fff; color: var(--neon-red); border-color: var(--neon-red); width: 35%; }
+
+        .auth-btn { width: 100%; margin-bottom: 8px; }
+        .btn-google { background: white; color: #444; border-color: #ccc; display: flex; align-items: center; justify-content: center; gap: 10px;}
+
+        .shop-item { display: flex; justify-content: space-between; align-items: center; background: #f4f4f4; border: 2px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 8px; text-align: left;}
+        .shop-item span { font-weight: bold; font-size: 0.85rem; }
+        .shop-item small { display: block; color: var(--text-muted); font-size: 0.75rem; }
+        .shop-item button { padding: 5px 10px; background: var(--gba-gold); color: white; border: 2px solid #b8960b; font-size: 0.8rem;}
+
+        #farm-section { background-color: var(--gba-mint); border: 4px solid var(--border-color); padding: 10px; color: var(--text-main); border-radius: 8px; }
+        .gba-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 4px; background: rgba(255,255,255,0.4); padding: 5px; border: 2px inset var(--gba-blue); max-height: 250px; overflow-y: auto; }
+        .gba-cell { aspect-ratio: 1/1; background: var(--gba-blue); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+        .gba-cell.selected { border: 3px solid orange; box-shadow: inset 0 0 5px orange; }
+        .gba-mini-sprite { width: 40px; height: 40px; background-size: 160px 40px; background-repeat: no-repeat; image-rendering: pixelated; }
+
+        .gba-summary-panel { margin-top: 10px; background: var(--gba-blue); border: 2px solid var(--border-color); padding: 10px; text-align: left; font-size: 0.8rem; color: white;}
+        .gba-btn-group { display: flex; gap: 5px; margin-top: 8px; }
+        .gba-btn { flex: 1; padding: 5px; border: 2px solid var(--border-color); background: #eee; color: black; font-size: 0.7rem; cursor: pointer; }
+
+        .egg-container { display: flex; justify-content: space-around; margin: 20px 0; }
+        .egg-btn { background: #fff; border: 3px solid var(--border-color); color: var(--border-color); padding: 10px; cursor: pointer; border-radius: 8px; flex:1; margin:0 5px; }
+
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:9999; }
+        .modal-overlay.active { display: flex; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>TabTamer</h1>
+
+        <div id="top-bar" class="top-stats" style="display: none;">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Trainer</div>
+            <div class="coin-display">🪙 <span id="coin-count">0</span></div>
+            <button id="logout-btn" style="padding: 5px 10px; font-size: 0.7rem; background: var(--neon-red); color: white; border: 2px solid darkred;">Logout</button>
+        </div>
+
+        <div id="login-section">
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; font-weight: bold;">Log in to start focusing</p>
+            <input type="email" id="email-input" class="auth-input" placeholder="Email">
+            <input type="password" id="password-input" class="auth-input" placeholder="Password">
+            
+            <button id="login-btn" class="auth-btn" style="background:var(--border-color); color:white;">Log In</button>
+            <button id="signup-btn" class="auth-btn" style="background:white; color:var(--border-color);">Sign Up</button>
+            
+            <hr style="margin: 15px 0; border: 1px solid #eee;">
+            <button id="google-btn" class="auth-btn btn-google">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18" alt="Google"> Continue with Google
+            </button>
+        </div>
+
+        <div id="egg-selection" style="display: none;">
+            <h3 class="pixel-font" style="font-size: 0.8rem; margin: 15px 0;">Pick your starter!</h3>
+            <div class="egg-container">
+                <button class="egg-btn" onclick="claimStarter(1)">🐣<br>FIRE</button>
+                <button class="egg-btn" onclick="claimStarter(4)">🌊<br>WATER</button>
+                <button class="egg-btn" onclick="claimStarter(7)">🌿<br>GRASS</button>
+            </div>
+        </div>
+
+        <div id="nav-bar" class="nav-bar">
+            <button id="nav-arena" class="nav-btn active">ARENA</button>
+            <button id="nav-farm" class="nav-btn">FARM</button>
+            <button id="nav-shop" class="nav-btn">SHOP</button>
+            <button id="nav-pomodex" class="nav-btn">DEX</button>
+        </div>
+
+        <div id="game-section" style="display: none;">
+            <div class="hp-wrapper">
+                <div class="hp-labels"><span>HP</span><span id="hp-text">100 / 100</span></div>
+                <div class="hp-bar-container"><div id="hp-fill"></div></div>
+            </div>
+
+            <div id="sprite-renderer" style="min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center;"></div>
+
+            <div class="intention-tracker" style="margin-bottom: 10px;">
+                <input type="text" id="mission-input" placeholder="What is the mission?" autocomplete="off" style="padding: 8px; width: 80%; border: 2px solid var(--border-color); border-radius: 6px; font-family: 'Nunito'; font-weight: bold;" />
+            </div>
+
+            <div style="margin-bottom: 10px;">
+                <label for="audio-select" style="font-weight: bold; font-size: 0.8rem; color: var(--text-muted);">Ambient Audio:</label>
+                <select id="audio-select" style="padding: 5px; border-radius: 4px; border: 2px solid var(--border-color); font-family: 'Nunito'; font-weight: bold;">
+                    <option value="none">| None</option>
+                    <option value="rain">| Dynamic Rain</option>
+                    <option value="brown">| Ocean Waves</option>
+                    <option value="hum">| Ethereal Hum</option>
+                </select>
+            </div>
+
+            <div style="margin-top: 5px; font-weight: bold; color: var(--text-muted);">
+                Focus (Mins): <input type="number" id="time-input" min="1" style="border:2px solid #ccc; width:60px; border-radius: 4px; padding: 2px 5px; font-weight: bold;">
+            </div>
+
+            <div class="timer-display" id="timer">25:00</div>
+
+            <div style="display: flex; justify-content: space-between;">
+                <button id="start-btn">Start Session</button>
+                <button id="give-up-btn">Give Up</button>
+            </div>
+        </div>
+        
+        <div id="farm-section" style="display:none;">
+            <h4 class="pixel-font" style="font-size:0.7rem; margin-bottom:8px;">POMO-MON STORAGE</h4>
+            <div id="gba-grid" class="gba-grid"></div>
+            
+            <div id="gba-summary" class="gba-summary-panel">
+                <div id="summary-content">Select a Pomo-mon...</div>
+                <div class="gba-btn-group">
+                    <button class="gba-btn" id="gba-equip-btn" style="display:none;">EQUIP</button>
+                    <button class="gba-btn" id="gba-cancel-btn">CANCEL</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="shop-section" style="display:none;">
+            <h4 class="pixel-font" style="font-size:0.8rem; margin-bottom:15px; color: var(--gba-gold);">POKé-MART</h4>
+            
+            <div class="shop-item">
+                <div>
+                    <span>🍎 Pom-Apple</span>
+                    <small>Restores 20 HP</small>
+                </div>
+                <button onclick="buyItem('apple', 5)">5 🪙</button>
+            </div>
+
+            <div class="shop-item">
+                <div>
+                    <span>🧪 Super Potion</span>
+                    <small>Restores 50 HP</small>
+                </div>
+                <button onclick="buyItem('potion', 10)">10 🪙</button>
+            </div>
+
+            <div class="shop-item">
+                <div>
+                    <span>🥚 Mystery Egg</span>
+                    <small>Random new Pomo-mon!</small>
+                </div>
+                <button onclick="buyItem('egg', 50)">50 🪙</button>
+            </div>
+        </div>
+
+        <div id="pomodex-section" style="display:none; background-color: var(--panel-bg); border: 4px solid var(--border-color); padding: 10px; border-radius: 8px;">
+            <h4 class="pixel-font" style="font-size:0.8rem; margin-bottom:15px; color: var(--border-color);">THE POMO-DEX</h4>
+            <div id="dex-grid" class="gba-grid" style="grid-template-columns: repeat(4, 1fr); max-height: 350px; overflow-y: scroll; gap: 6px; padding-right: 5px;"></div>
+        </div>
+    </div>
+
+    <div id="mission-modal" class="modal-hidden">
+        <div class="modal-content">
+            <h2 class="pixel-font" style="font-size: 0.8rem; margin-bottom: 10px;">Session Complete!</h2>
+            <p style="font-family: 'Nunito'; margin-bottom: 10px;">Did you accomplish your mission: <br><strong id="mission-display"></strong>?</p>
+            <div class="modal-buttons">
+                <button id="btn-mission-yes">YES</button>
+                <button id="btn-mission-no">NOT QUITE</button>
+            </div>
+            <p id="supportive-message" style="display: none; color: #555; margin-top: 10px; font-weight: bold;"></p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="penalty-modal">
+        <div style="background:#fff; padding:2rem; border:4px solid var(--neon-red); border-radius:12px; text-align:center; max-width: 90%;">
+            <h2 class="pixel-font" style="color:var(--neon-red); font-size: 1.2rem;">TAB SWITCHED!</h2>
+            <p style="margin: 15px 0; font-weight: bold;">Your Pomo-mon took 15 damage!</p>
+            <button id="resume-btn" style="background:var(--neon-red); color:white; width:100%;">Resume</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore as getDB, doc as fsDoc, getDoc as fsGetDoc, setDoc as fsSetDoc, updateDoc as fsUpdateDoc, increment as fsIncrement, collection as fsCollection, getDocs as fsGetDocs, addDoc as fsAddDoc, deleteDoc as fsDeleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABCxcL0uRz_ypOjjCb_lsft0AWOTO--Ls",
+            authDomain: "pomo-mon.firebaseapp.com",
+            projectId: "pomo-mon",
+            storageBucket: "pomo-mon.firebasestorage.app",
+            messagingSenderId: "273551072268",
+            appId: "1:273551072268:web:7d5650f2b3b877c4702229"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDB(app);
+
+        const POMODEX = [
+            { id: 1, name: "Emberling", nextEvolutionId: 2, evolutionXpThreshold: 500 },
+            { id: 2, name: "Flarehound", nextEvolutionId: 3, evolutionXpThreshold: 2000 },
+            { id: 3, name: "Infernox", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 4, name: "Splashy", nextEvolutionId: 5, evolutionXpThreshold: 500 },
+            { id: 5, name: "Riverun", nextEvolutionId: 6, evolutionXpThreshold: 2000 },
+            { id: 6, name: "Tsunamiath", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 7, name: "Seedling", nextEvolutionId: 8, evolutionXpThreshold: 500 },
+            { id: 8, name: "Vineguard", nextEvolutionId: 9, evolutionXpThreshold: 2000 },
+            { id: 9, name: "Forestking", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 10, name: "Sparky", nextEvolutionId: 11, evolutionXpThreshold: 500 },
+            { id: 11, name: "Voltstrike", nextEvolutionId: 12, evolutionXpThreshold: 2000 },
+            { id: 12, name: "Thunderlord", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 13, name: "Pebble", nextEvolutionId: 14, evolutionXpThreshold: 500 },
+            { id: 14, name: "Boulderback", nextEvolutionId: 15, evolutionXpThreshold: 2000 },
+            { id: 15, name: "Mountainous", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 16, name: "Bit", nextEvolutionId: 17, evolutionXpThreshold: 500 },
+            { id: 17, name: "Byte", nextEvolutionId: 18, evolutionXpThreshold: 2000 },
+            { id: 18, name: "Megahertz", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 19, name: "Starlet", nextEvolutionId: 20, evolutionXpThreshold: 500 },
+            { id: 20, name: "Orbitron", nextEvolutionId: 21, evolutionXpThreshold: 2000 },
+            { id: 21, name: "Galaxia", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 22, name: "Spook", nextEvolutionId: 23, evolutionXpThreshold: 500 },
+            { id: 23, name: "Phantom", nextEvolutionId: 24, evolutionXpThreshold: 2000 },
+            { id: 24, name: "Poltergeist", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 25, name: "Frostbite", nextEvolutionId: 26, evolutionXpThreshold: 500 },
+            { id: 26, name: "Glacier", nextEvolutionId: 27, evolutionXpThreshold: 2000 },
+            { id: 27, name: "Avalanche", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 28, name: "Wyrmling", nextEvolutionId: 29, evolutionXpThreshold: 500 },
+            { id: 29, name: "Drake", nextEvolutionId: 30, evolutionXpThreshold: 2000 },
+            { id: 30, name: "Dragonite", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 31, name: "Scrap", nextEvolutionId: 32, evolutionXpThreshold: 500 },
+            { id: 32, name: "Metalclad", nextEvolutionId: 33, evolutionXpThreshold: 2000 },
+            { id: 33, name: "Titanium", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 34, name: "Smog", nextEvolutionId: 35, evolutionXpThreshold: 500 },
+            { id: 35, name: "Toxic", nextEvolutionId: 36, evolutionXpThreshold: 2000 },
+            { id: 36, name: "Hazmat", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 37, name: "Breeze", nextEvolutionId: 38, evolutionXpThreshold: 500 },
+            { id: 38, name: "Gale", nextEvolutionId: 39, evolutionXpThreshold: 2000 },
+            { id: 39, name: "Hurricane", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 40, name: "Grub", nextEvolutionId: 41, evolutionXpThreshold: 500 },
+            { id: 41, name: "Chrysalis", nextEvolutionId: 42, evolutionXpThreshold: 2000 },
+            { id: 42, name: "Swarm", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 43, name: "Scrapper", nextEvolutionId: 44, evolutionXpThreshold: 500 },
+            { id: 44, name: "Brawler", nextEvolutionId: 45, evolutionXpThreshold: 2000 },
+            { id: 45, name: "Champion", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 46, name: "Mind", nextEvolutionId: 47, evolutionXpThreshold: 500 },
+            { id: 47, name: "Brain", nextEvolutionId: 48, evolutionXpThreshold: 2000 },
+            { id: 48, name: "Cortex", nextEvolutionId: null, evolutionXpThreshold: null },
+            { id: 49, name: "Pixie", nextEvolutionId: 50, evolutionXpThreshold: 500 },
+            { id: 50, name: "Sprite", nextEvolutionId: 51, evolutionXpThreshold: 2000 },
+            { id: 51, name: "Archfey", nextEvolutionId: null, evolutionXpThreshold: null }
+        ];
+
+        function getPomoData(id) { return POMODEX.find(p => p.id === id); }
+
+        let currentUserUid = null;
+        let activeMonsterDocId = null;
+        let currentPomoId = null; 
+        let currentHP = 100;
+        let currentCoins = 0;
+        let timeLeft = 25 * 60;
+        let activeFocusMins = 25; 
+        let isRunning = false;
+        let timerInterval;
+        let rosterData = [];
+        let selectedMonsterDocId = null;
+
+        const savedTimer = localStorage.getItem('pomoTimerPref') || 25;
+        document.getElementById('time-input').value = savedTimer;
+        timeLeft = savedTimer * 60;
+
+        const spriteRenderer = document.getElementById('sprite-renderer');
+        const timerDisplay = document.getElementById('timer');
+        const hpFill = document.getElementById('hp-fill');
+        const hpText = document.getElementById('hp-text');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserUid = user.uid;
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('top-bar').style.display = 'flex';
+                checkPlayerEcosystem(user.uid);
+            }
+        });
+
+        async function checkPlayerEcosystem(uid) {
+            const snap = await fsGetDoc(fsDoc(db, "players", uid));
+            if (snap.exists()) {
+                currentCoins = snap.data().coins || 0;
+                document.getElementById('coin-count').innerText = currentCoins;
+                
+                if (snap.data().active_pomomon_id) {
+                    activeMonsterDocId = snap.data().active_pomomon_id;
+                    showArena();
+                } else {
+                    document.getElementById('egg-selection').style.display = 'block';
+                }
+            } else {
+                document.getElementById('egg-selection').style.display = 'block';
+            }
+        }
+
+        window.claimStarter = async (starterId) => {
+            const newMonster = { pomodexId: starterId, hp: 100, xp: 0 };
+            const docRef = await fsAddDoc(fsCollection(db, "players", currentUserUid, "roster"), newMonster);
+            await fsSetDoc(fsDoc(db, "players", currentUserUid), { active_pomomon_id: docRef.id, coins: 0 }, { merge: true });
+            activeMonsterDocId = docRef.id;
+            document.getElementById('egg-selection').style.display = 'none';
+            showArena();
+        };
+
+        function showArena() {
+            document.getElementById('nav-bar').style.display = 'flex';
+            document.getElementById('game-section').style.display = 'block';
+            document.getElementById('farm-section').style.display = 'none';
+            document.getElementById('shop-section').style.display = 'none';
+            document.getElementById('pomodex-section').style.display = 'none';
+            initMonster();
+        }
+
+        async function initMonster() {
+            const snap = await fsGetDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId));
+            if(snap.exists()){
+                const data = snap.data();
+                currentHP = Number(data.hp);
+                if (isNaN(currentHP)) currentHP = 100;
+                let currentXp = Number(data.xp);
+                if (isNaN(currentXp)) currentXp = 0;
+                let currentLevel = Math.floor(currentXp / 100) + 1;
+                currentPomoId = data.pomodexId || 1; 
+                const pomoMeta = getPomoData(currentPomoId) || getPomoData(1);
+                updateHPDisplay();
+                let xpToNextLevel = 100 - (currentXp % 100);
+                let evoText = pomoMeta.nextEvolutionId ? `<br><span style="color:var(--text-muted); font-size:0.75rem;">(Evolves in ${Math.floor(pomoMeta.evolutionXpThreshold/100) + 1 - currentLevel} Levels)</span>` : `<br><span style="color:var(--gba-gold); font-size:0.75rem;">(Max Evolution)</span>`;
+                spriteRenderer.innerHTML = `<div id="active-sprite" class="sprite-viewport"></div><div style="font-weight:bold; color:var(--text-main); margin-top:10px; text-align:center;">${pomoMeta.name} (Lv. ${currentLevel} | ${currentXp} XP)<br><span style="color:var(--border-color); font-size:0.85rem;">${xpToNextLevel} XP to next Level</span>${evoText}</div>`;
+                setPomomonState('idle'); 
+            }
+        }
+
+        function setPomomonState(stateName) {
+            const spriteDiv = document.getElementById('active-sprite');
+            if (!spriteDiv || !currentPomoId) return;
+            spriteDiv.style.backgroundImage = `url('pomomon${currentPomoId}_${stateName}_strip.png'.toLowerCase())`;
+            spriteDiv.style.animation = stateName === 'attack' ? 'play-sprite 0.6s steps(4) forwards' : 'play-sprite 0.8s steps(4) infinite';
+        }
+
+        document.getElementById('time-input').addEventListener('input', (e) => {
+            if (!isRunning) {
+                let mins = parseInt(e.target.value);
+                if (isNaN(mins) || mins < 1) mins = 25;
+                timeLeft = mins * 60;
+                localStorage.setItem('pomoTimerPref', mins); 
+                updateTimerUI();
+            }
+        });
+
+        document.getElementById('start-btn').onclick = async () => {
+            if (isRunning) return;
+            if (currentHP <= 0) return alert("Your Pomo-mon is fainted! Heal it in the Shop.");
+            try { if (Tone.context.state !== 'running') await Tone.context.resume(); await Tone.start(); playAmbientAudio(); } catch(e){ console.error("Audio blocked:", e); }
+            let focusMins = parseInt(document.getElementById('time-input').value) || 25;
+            timeLeft = focusMins * 60;
+            activeFocusMins = focusMins; 
+            isRunning = true;
+            document.getElementById('start-btn').innerText = "FOCUSING...";
+            setPomomonState('attack');
+            await new Promise(r => setTimeout(r, 600));
+            if (isRunning) {
+                setPomomonState('walk');
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerUI();
+                    if (timeLeft <= 0) completeSession();
+                }, 1000);
+            }
+        };
+
+        document.getElementById('give-up-btn').onclick = async () => {
+            if (!isRunning) return;
+            if (confirm("If you give up, your Pomo-mon will take 20 damage. Continue?")) {
+                clearInterval(timerInterval);
+                stopAmbientAudio();
+                isRunning = false;
+                currentHP = Math.max(0, currentHP - 20);
+                updateHPDisplay();
+                setPomomonState('idle');
+                await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
+                resetSession();
+                alert("Session abandoned.");
+            }
+        };
+
+        async function completeSession() {
+            clearInterval(timerInterval);
+            isRunning = false; 
+            stopAmbientAudio();
+            triggerPostSessionModal();
+        }
+
+        async function checkEvolution(docId) {
+            const snap = await fsGetDoc(fsDoc(db, "players", currentUserUid, "roster", docId));
+            if(!snap.exists()) return;
+            const data = snap.data();
+            const pomoMeta = getPomoData(data.pomodexId);
+            if (pomoMeta.nextEvolutionId && (Number(data.xp) || 0) >= pomoMeta.evolutionXpThreshold) {
+                await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", docId), { pomodexId: getPomoData(pomoMeta.nextEvolutionId).id });
+                alert(`WHAT? ${pomoMeta.name} is evolving! ✨`);
+            }
+            await initMonster(); 
+        }
+
+        function resetSession() {
+            isRunning = false;
+            let mins = parseInt(document.getElementById('time-input').value) || 25;
+            timeLeft = mins * 60;
+            document.getElementById('start-btn').innerText = "Start Session";
+            setPomomonState('idle');
+            updateTimerUI();
+        }
+        
+        window.buyItem = async (itemType, cost) => {
+            if (currentCoins < cost) return alert("You don't have enough Focus Coins!");
+            currentCoins -= cost;
+            document.getElementById('coin-count').innerText = currentCoins;
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid), { coins: fsIncrement(-cost) });
+            if (itemType === 'apple' || itemType === 'potion') {
+                currentHP = Math.min(100, currentHP + (itemType === 'apple' ? 20 : 50));
+                await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
+                updateHPDisplay();
+                alert(`Used ${itemType === 'apple' ? 'Pom-Apple' : 'Super Potion'}!`);
+            } else if (itemType === 'egg') {
+                const baseStages = [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49];
+                await fsAddDoc(fsCollection(db, "players", currentUserUid, "roster"), { pomodexId: baseStages[Math.floor(Math.random() * baseStages.length)], hp: 100, xp: 0 });
+                alert("The egg hatched!");
+            }
+        };
+
+        async function loadFarm() {
+            const grid = document.getElementById('gba-grid');
+            grid.innerHTML = '';
+            const snap = await fsGetDocs(fsCollection(db, "players", currentUserUid, "roster"));
+            rosterData = []; snap.forEach(d => rosterData.push({ docId: d.id, ...d.data() }));
+            for (let i = 0; i < 51; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'gba-cell';
+                if (rosterData[i]) {
+                    const pData = getPomoData(rosterData[i].pomodexId || 1);
+                    cell.innerHTML = `<div class="gba-mini-sprite" style="background-image: url('pomomon${pData.id}_idle_strip.png');"></div>`;
+                    cell.onclick = () => selectMonster(rosterData[i], pData, cell);
+                } else {
+                    cell.style.opacity = "0.3"; cell.innerHTML = `<div style="font-size: 0.5rem; color: #fff;">Empty</div>`;
+                }
+                grid.appendChild(cell);
+            }
+        }
+
+        function selectMonster(rosterEntry, pomoMeta, cellElement) {
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+            cellElement.classList.add('selected');
+            selectedMonsterDocId = rosterEntry.docId;
+            let displayXp = Number(rosterEntry.xp) || 0;
+            document.getElementById('summary-content').innerHTML = `<strong>${pomoMeta.name}</strong><br>HP: ${Number(rosterEntry.hp) || 100}/100<br>Lv. ${Math.floor(displayXp/100)+1} | ${displayXp} XP`;
+            document.getElementById('gba-equip-btn').style.display = 'block';
+        }
+
+        document.getElementById('gba-equip-btn').onclick = async () => {
+            if (!selectedMonsterDocId) return;
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid), { active_pomomon_id: selectedMonsterDocId });
+            activeMonsterDocId = selectedMonsterDocId;
+            document.getElementById('nav-arena').click();
+        };
+
+        document.getElementById('gba-cancel-btn').onclick = () => {
+            document.querySelectorAll('.gba-cell').forEach(c => c.classList.remove('selected'));
+            document.getElementById('summary-content').innerText = 'Select a Pomo-mon...';
+            document.getElementById('gba-equip-btn').style.display = 'none';
+        };
+
+        async function loadDex() {
+            const grid = document.getElementById('dex-grid');
+            grid.innerHTML = '';
+            const snap = await fsGetDocs(fsCollection(db, "players", currentUserUid, "roster"));
+            const ownedIds = snap.docs.map(d => d.data().pomodexId);
+            POMODEX.forEach(pomo => {
+                const isOwned = ownedIds.includes(pomo.id);
+                const cell = document.createElement('div');
+                cell.className = 'gba-cell';
+                cell.style.background = isOwned ? 'var(--gba-mint)' : '#e0e0e0';
+                cell.innerHTML = `<div class="gba-mini-sprite" style="background-image: url('pomomon${pomo.id}_idle_strip.png'); ${isOwned ? '' : 'filter: brightness(0) opacity(0.2);'}"></div><div style="position:absolute; bottom:2px; right: 4px; font-size:9px; font-family: monospace; font-weight:bold; color: #333;">#${pomo.id}</div>`;
+                cell.onclick = () => alert(isOwned ? `No. ${pomo.id}: ${pomo.name}` : `No. ${pomo.id}: ???`);
+                grid.appendChild(cell);
+            });
+        }
+
+        function updateHPDisplay() {
+            hpFill.style.width = currentHP + "%";
+            hpText.innerText = `${currentHP} / 100`;
+            hpFill.style.backgroundColor = currentHP > 50 ? "var(--neon-green)" : (currentHP > 20 ? "var(--gba-gold)" : "var(--neon-red)");
+        }
+
+        function updateTimerUI() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+
+        // THE BULLETPROOF TAB-SWITCH PENALTY
+        document.addEventListener('visibilitychange', async () => {
+            if (document.hidden && isRunning && timeLeft > 0) { 
+                clearInterval(timerInterval);
+                stopAmbientAudio(); 
+                currentHP = Math.max(0, currentHP - 15);
+                updateHPDisplay();
+                setPomomonState('idle');
+                if (currentUserUid && activeMonsterDocId) {
+                    await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { hp: currentHP });
+                }
+                document.getElementById('penalty-modal').classList.add('active');
+            }
+        });
+
+        document.getElementById('resume-btn').onclick = async () => {
+            document.getElementById('penalty-modal').classList.remove('active');
+            isRunning = true;
+            try { if (Tone.context.state !== 'running') await Tone.context.resume(); await Tone.start(); playAmbientAudio(); } catch(e){}
+            document.getElementById('start-btn').innerText = "FOCUSING...";
+            setPomomonState('walk');
+            timerInterval = setInterval(() => {
+                timeLeft--; updateTimerUI();
+                if (timeLeft <= 0) completeSession();
+            }, 1000);
+        };
+
+        function switchTab(tabName) {
+            if(isRunning) return alert("Finish your focus session first!");
+            ['game-section', 'farm-section', 'shop-section', 'pomodex-section'].forEach(id => document.getElementById(id).style.display = 'none');
+            document.getElementById(tabName + '-section').style.display = 'block';
+            if(tabName === 'farm') loadFarm(); if(tabName === 'arena') initMonster(); if(tabName === 'pomodex') loadDex();
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.id === `nav-${tabName}`));
+        }
+
+        document.getElementById('nav-arena').onclick = () => switchTab('arena');
+        document.getElementById('nav-farm').onclick = () => switchTab('farm');
+        document.getElementById('nav-shop').onclick = () => switchTab('shop');
+        document.getElementById('nav-pomodex').onclick = () => switchTab('pomodex');
+        document.getElementById('logout-btn').onclick = async () => { await signOut(auth); window.location.reload(); };
+        document.getElementById('login-btn').onclick = async () => {
+            const e = document.getElementById('email-input').value, p = document.getElementById('password-input').value;
+            try { await Tone.start(); await signInWithEmailAndPassword(auth, e, p); } catch (err) { alert(err.message); }
+        };
+        document.getElementById('signup-btn').onclick = async () => {
+            const e = document.getElementById('email-input').value, p = document.getElementById('password-input').value;
+            try { await Tone.start(); await createUserWithEmailAndPassword(auth, e, p); } catch (err) { alert(err.message); }
+        };
+        document.getElementById('google-btn').onclick = async () => { try { await Tone.start(); await signInWithPopup(auth, new GoogleAuthProvider()); } catch (err) { alert(err.message); } };
+
+        /* =========================================
+           CORE REPAIRED AUDIO LIBRARY (TONE.JS)
+           ========================================= */
+
+        const rainFilter = new Tone.Filter(400, "lowpass").toDestination();
+        const rainNoise = new Tone.Noise("pink").connect(rainFilter);
+        const rainLFO = new Tone.LFO(0.1, 300, 800).connect(rainFilter.frequency); 
+        rainNoise.volume.value = -10;
+
+        const oceanFilter = new Tone.Filter(200, "lowpass").toDestination();
+        const oceanNoise = new Tone.Noise("brown").connect(oceanFilter);
+        const waveLFO = new Tone.LFO(0.15, 100, 500).connect(oceanFilter.frequency); 
+        oceanNoise.volume.value = -5;
+
+        // BUG FIX: Removed global .start() call to prevent browser crashes
+        const humChorus = new Tone.Chorus(4, 2.5, 0.5).toDestination();
+        const humFilter = new Tone.Filter(400, "lowpass").connect(humChorus);
+        const cyberHumNode = new Tone.Oscillator(100, "fatsawtooth").connect(humFilter);
+        const humLFO = new Tone.LFO(0.2, 300, 500).connect(humFilter.frequency); 
+        cyberHumNode.volume.value = -15;
+
+        let activeAudioNode = null;
+        let activeLFO = null;
+
+        function playAmbientAudio() {
+            stopAmbientAudio(); 
+            const selection = document.getElementById('audio-select').value;
+            if (selection === 'rain') { activeAudioNode = rainNoise; activeLFO = rainLFO; }
+            else if (selection === 'brown') { activeAudioNode = oceanNoise; activeLFO = waveLFO; }
+            else if (selection === 'hum') { 
+                activeAudioNode = cyberHumNode; 
+                activeLFO = humLFO; 
+                humChorus.start(); // BUG FIX: Safely triggered only on user action
+            }
+            if (activeAudioNode) { activeAudioNode.start(); if (activeLFO) activeLFO.start(); }
+        }
+
+        function stopAmbientAudio() {
+            if (activeAudioNode) { activeAudioNode.stop(); activeAudioNode = null; }
+            if (activeLFO) { activeLFO.stop(); activeLFO = null; }
+        }
+
+        function triggerPostSessionModal() {
+            document.getElementById('mission-display').textContent = document.getElementById('mission-input').value || "Stay focused";
+            document.getElementById('supportive-message').style.display = 'none';
+            document.getElementById('btn-mission-yes').style.display = 'inline-block';
+            document.getElementById('btn-mission-no').style.display = 'inline-block';
+            document.getElementById('mission-modal').className = 'modal-active';
+        }
+
+        function closeModal() {
+            setTimeout(() => { document.getElementById('mission-modal').className = 'modal-hidden'; document.getElementById('mission-input').value = ""; resetSession(); }, 1500);
+        }
+
+        document.getElementById('btn-mission-yes').addEventListener('click', async () => {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            const s = document.getElementById('active-sprite');
+            if (s) { s.classList.add('jump-animation'); setTimeout(() => s.classList.remove('jump-animation'), 1200); }
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { xp: fsIncrement(activeFocusMins * 10) });
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid), { coins: fsIncrement(activeFocusMins) });
+            currentCoins += activeFocusMins;
+            document.getElementById('coin-count').innerText = currentCoins;
+            await checkEvolution(activeMonsterDocId);
+            closeModal();
+        });
+
+        document.getElementById('btn-mission-no').addEventListener('click', async () => {
+            document.getElementById('btn-mission-yes').style.display = 'none';
+            document.getElementById('btn-mission-no').style.display = 'none';
+            document.getElementById('supportive-message').textContent = "Great focus. We will get it next round.";
+            document.getElementById('supportive-message').style.display = 'block';
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid, "roster", activeMonsterDocId), { xp: fsIncrement(activeFocusMins * 5) });
+            await fsUpdateDoc(fsDoc(db, "players", currentUserUid), { coins: fsIncrement(activeFocusMins) });
+            currentCoins += activeFocusMins;
+            document.getElementById('coin-count').innerText = currentCoins;
+            await checkEvolution(activeMonsterDocId);
+            closeModal();
+        });
+
+        updateTimerUI();
+    </script>
+</body>
+</html>
